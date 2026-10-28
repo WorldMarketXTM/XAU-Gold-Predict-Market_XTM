@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XAU-Gold-Volatility-Market_XTM - predict</title>
+    <title>WorldMarketXTM - Multi-Asset Volatility Predict</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
         }
         .app-card {
             background-color: #ffffff;
-            width: 580px;
+            width: 600px;
             padding: 24px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
@@ -48,6 +48,34 @@
             border-radius: 16px;
             background: #fff;
         }
+
+        /* Selector de Activos (Pestañas) */
+        .asset-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 12px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85em;
+            cursor: pointer;
+            background: transparent;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
         .market-title {
             font-size: 1.25em;
             font-weight: 700;
@@ -56,9 +84,7 @@
             align-items: center;
             gap: 8px;
         }
-        .xau-icon {
-            background: #f59e0b;
-            color: #fff;
+        .asset-icon {
             width: 26px;
             height: 26px;
             border-radius: 50%;
@@ -67,12 +93,14 @@
             align-items: center;
             font-weight: bold;
             font-size: 0.75em;
+            color: #fff;
         }
         .vencimiento-text {
             font-size: 0.82em;
             color: #667085;
             margin-bottom: 15px;
         }
+
         .prices-grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -94,7 +122,7 @@
         .val-initial { color: #d97706; font-size: 1.1em; font-weight: 800; }
         .val-current { color: #ea580c; font-size: 1.15em; font-weight: 800; }
         .val-delta   { color: #dc2626; font-size: 1.1em; font-weight: 800; }
-        
+
         .calc-panel {
             background-color: #0f172a;
             border: 1px solid #334155;
@@ -154,6 +182,7 @@
             padding: 8px;
             border: 1px solid #e2e8f0;
         }
+
         .options-container {
             display: flex;
             gap: 12px;
@@ -202,8 +231,16 @@
         <span class="badge-clasico">Clásico</span>
     </div>
 
+    <!-- Pestañas para cambiar entre activos -->
+    <div class="asset-tabs">
+        <button class="tab-btn active" onclick="switchAsset('BTC')">₿ BITCOIN</button>
+        <button class="tab-btn" onclick="switchAsset('XAU')">🟡 ORO (XAU)</button>
+        <button class="tab-btn" onclick="switchAsset('SNDK')">💾 SANDISK</button>
+    </div>
+
     <div class="market-title">
-        <span class="xau-icon">Au</span> XAU Up or Down 15m
+        <span class="asset-icon" id="asset-icon" style="background:#f7931a;">₿</span>
+        <span id="asset-title-text">BTC Up or Down 1h</span>
     </div>
 
     <div class="vencimiento-text">
@@ -227,7 +264,7 @@
 
     <div class="calc-panel">
         <div class="calc-panel-title">
-            <span>Algoritmo Cuántico (Filtro Anti-Ruido)</span>
+            <span>Algoritmo Cuantitativo (Filtro Anti-Ruido)</span>
             <span id="trend-indicator" style="color: #94a3b8;">Estable</span>
         </div>
         <div class="calc-targets-grid">
@@ -259,18 +296,25 @@
     <div class="options-container">
         <div class="opt-btn up-btn" id="btn-up">
             <div class="btn-text">UP</div>
-            <div class="btn-num">+2.00</div>
+            <div class="btn-num" id="btn-up-num">+375.00</div>
         </div>
         <div class="opt-btn down-btn" id="btn-down">
             <div class="btn-text">DOWN</div>
-            <div class="btn-num">-2.00</div>
+            <div class="btn-num" id="btn-down-num">-375.00</div>
         </div>
     </div>
 </div>
 
 <script>
+    const CONFIG = {
+        BTC: { symbol: 'btcusdt', name: 'BTC Up or Down 1h', interval: '1h', threshold: 375.0, icon: '₿', iconBg: '#f7931a', color: '#f7931a' },
+        XAU: { symbol: 'paxgusdt', name: 'XAU Up or Down 15m', interval: '15m', threshold: 2.0, icon: 'Au', iconBg: '#f59e0b', color: '#f59e0b' },
+        SNDK: { symbol: 'sndkusdt', name: 'SNDK Up or Down 15m', interval: '15m', threshold: 3.0, icon: 'SD', iconBg: '#7042e4', color: '#7042e4' }
+    };
+
+    let currentAsset = 'BTC';
     let basePrice = null;
-    const THRESHOLD = 2.0;
+    let ws = null;
 
     let secPrices = [];
     let secLabels = [];
@@ -281,185 +325,137 @@
     const ctxSec = document.getElementById('secChart').getContext('2d');
     const secChart = new Chart(ctxSec, {
         type: 'line',
-        data: {
-            labels: secLabels,
-            datasets: [{
-                data: secPrices,
-                borderColor: '#f59e0b',
-                borderWidth: 1.8,
-                pointRadius: 0,
-                stepped: true,
-                tension: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 }, maxTicksLimit: 6 } },
-                y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } }, position: 'right' }
-            },
-            plugins: { legend: { display: false } }
-        }
+        data: { labels: secLabels, datasets: [{ data: secPrices, borderColor: '#f7931a', borderWidth: 1.8, pointRadius: 0, stepped: true }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } } }, y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } }, position: 'right' } }, plugins: { legend: { display: false } } }
     });
 
     const ctxMin = document.getElementById('minChart').getContext('2d');
     const minChart = new Chart(ctxMin, {
         type: 'line',
-        data: {
-            labels: minLabels,
-            datasets: [{
-                data: minPrices,
-                borderColor: '#7042e4',
-                borderWidth: 1.8,
-                pointRadius: 0,
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 }, maxTicksLimit: 8 } },
-                y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } }, position: 'right' }
-            },
-            plugins: { legend: { display: false } }
-        }
+        data: { labels: minLabels, datasets: [{ data: minPrices, borderColor: '#7042e4', borderWidth: 1.8, pointRadius: 0, tension: 0.1 }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } } }, y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } }, position: 'right' } }, plugins: { legend: { display: false } } }
     });
 
-    async function loadBinanceData() {
+    function switchAsset(assetKey) {
+        currentAsset = assetKey;
+        const cfg = CONFIG[assetKey];
+
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        document.getElementById('asset-title-text').innerText = cfg.name;
+        const iconElem = document.getElementById('asset-icon');
+        iconElem.innerText = cfg.icon;
+        iconElem.style.background = cfg.iconBg;
+
+        document.getElementById('btn-up-num').innerText = `+${cfg.threshold.toFixed(2)}`;
+        document.getElementById('btn-down-num').innerText = `-${cfg.threshold.toFixed(2)}`;
+
+        secChart.data.datasets[0].borderColor = cfg.color;
+
+        secPrices = []; secLabels = [];
+        minPrices = []; minLabels = [];
+        secChart.update(); minChart.update();
+
+        initAssetData();
+    }
+
+    async function initAssetData() {
+        const cfg = CONFIG[currentAsset];
+        if (ws) ws.close();
+
         try {
-            const res15m = await fetch('https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=15m&limit=1');
-            const data15m = await res15m.json();
-            basePrice = parseFloat(data15m[0][1]);
+            const resInit = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
+            const dataInit = await resInit.json();
+            basePrice = parseFloat(dataInit[0][1]);
             document.getElementById('base-price').innerText = `$${basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-            const res1m = await fetch('https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=1m&limit=60');
+            const res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=1m&limit=60`);
             const data1m = await res1m.json();
 
-            minPrices = [];
-            minLabels = [];
+            minPrices = []; minLabels = [];
             data1m.forEach(candle => {
-                const timeStr = new Date(candle[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 minPrices.push(parseFloat(candle[4]));
-                minLabels.push(timeStr);
+                minLabels.push(new Date(candle[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
             });
             minChart.data.labels = minLabels;
             minChart.data.datasets[0].data = minPrices;
             minChart.update();
         } catch (e) {
-            console.error("Error al cargar datos de oro:", e);
-        }
-    }
-
-    loadBinanceData();
-    setInterval(loadBinanceData, 30000);
-
-    const ws = new WebSocket("wss://stream.binance.com:9443/ws/paxgusdt@ticker");
-
-    ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        const price = parseFloat(data.c);
-        
-        if (basePrice === null) return;
-
-        const delta = price - basePrice;
-        const sign = delta >= 0 ? "+" : "";
-
-        document.getElementById('current-price').innerText = `$${price.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        const deltaElem = document.getElementById('delta-val');
-        deltaElem.innerText = `${sign}$${delta.toFixed(2)}`;
-        deltaElem.style.color = delta >= 0 ? "#10b981" : "#ef4444";
-
-        const btnUp = document.getElementById('btn-up');
-        const btnDown = document.getElementById('btn-down');
-
-        if (delta >= THRESHOLD) {
-            btnUp.classList.add('alert-up-active');
-            btnDown.classList.remove('alert-down-active');
-        } else if (delta <= -THRESHOLD) {
-            btnDown.classList.add('alert-down-active');
-            btnUp.classList.remove('alert-up-active');
-        } else {
-            btnUp.classList.remove('alert-up-active');
-            btnDown.classList.remove('alert-down-active');
+            console.error("Error al cargar datos base:", e);
         }
 
-        const now = new Date();
-        const secTimeStr = now.toLocaleTimeString();
-        secPrices.push(price);
-        secLabels.push(secTimeStr);
+        ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.symbol}@ticker`);
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const price = parseFloat(data.c);
+            if (!basePrice) return;
 
-        if (secPrices.length > 60) {
-            secPrices.shift();
-            secLabels.shift();
-        }
-        secChart.update();
+            const delta = price - basePrice;
+            const sign = delta >= 0 ? "+" : "";
 
-        const minTimeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        if (lastMinuteRecorded !== minTimeStr) {
-            lastMinuteRecorded = minTimeStr;
-            minPrices.push(price);
-            minLabels.push(minTimeStr);
-            if (minPrices.length > 60) {
-                minPrices.shift();
-                minLabels.shift();
-            }
-        } else if (minPrices.length > 0) {
-            minPrices[minPrices.length - 1] = price;
-        }
-        minChart.update();
+            document.getElementById('current-price').innerText = `$${price.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            const deltaElem = document.getElementById('delta-val');
+            deltaElem.innerText = `${sign}$${delta.toFixed(2)}`;
+            deltaElem.style.color = delta >= 0 ? "#10b981" : "#ef4444";
 
-        // Algoritmo Cuantitativo Mejorado (Suavizado de Inercia y Supresión de Ruido)
-        if (secPrices.length > 20) {
-            const pNow = price;
-            // Ventanas ponderadas exponenciales para filtrar ruido local
-            const p3s = secPrices[secPrices.length - 4];
-            const p10s = secPrices[secPrices.length - 15];
-
-            const alpha = 0.6; // Factor de amortiguación para evitar falsos positivos
-            const velRaw = (pNow - p3s) / 3;
-            const velSmooth = (pNow - p10s) / 10;
-            const blendedVel = (velRaw * alpha) + (velSmooth * (1 - alpha));
-
-            const target3s = pNow + (blendedVel * 3);
-            const target5s = pNow + (blendedVel * 5);
-            const target10s = pNow + (blendedVel * 10);
-
-            document.getElementById('target-3s').innerText = target3s.toFixed(2);
-            document.getElementById('target-5s').innerText = target5s.toFixed(2);
-            document.getElementById('target-10s').innerText = target10s.toFixed(2);
-
-            const trendIndicator = document.getElementById('trend-indicator');
-            if (blendedVel > 0.03) {
-                trendIndicator.innerText = "Tendencia Alcista 🚀";
-                trendIndicator.style.color = "#10b981";
-            } else if (blendedVel < -0.03) {
-                trendIndicator.innerText = "Tendencia Bajista 🔻";
-                trendIndicator.style.color = "#ef4444";
+            const btnUp = document.getElementById('btn-up');
+            const btnDown = document.getElementById('btn-down');
+            if (delta >= cfg.threshold) {
+                btnUp.classList.add('alert-up-active'); btnDown.classList.remove('alert-down-active');
+            } else if (delta <= -cfg.threshold) {
+                btnDown.classList.add('alert-down-active'); btnUp.classList.remove('alert-up-active');
             } else {
-                trendIndicator.innerText = "Filtro de Ruido (Estable) ⚖️";
-                trendIndicator.style.color = "#94a3b8";
+                btnUp.classList.remove('alert-up-active'); btnDown.classList.remove('alert-down-active');
             }
-        }
-    };
+
+            const now = new Date();
+            secPrices.push(price);
+            secLabels.push(now.toLocaleTimeString());
+            if (secPrices.length > 60) { secPrices.shift(); secLabels.shift(); }
+            secChart.update();
+
+            const minTimeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (lastMinuteRecorded !== minTimeStr) {
+                lastMinuteRecorded = minTimeStr;
+                minPrices.push(price); minLabels.push(minTimeStr);
+                if (minPrices.length > 60) { minPrices.shift(); minLabels.shift(); }
+            } else if (minPrices.length > 0) {
+                minPrices[minPrices.length - 1] = price;
+            }
+            minChart.update();
+
+            if (secPrices.length > 15) {
+                const pNow = price;
+                const p3s = secPrices[secPrices.length - 4];
+                const p10s = secPrices[secPrices.length - 15];
+                const blendedVel = (((pNow - p3s)/3) * 0.6) + (((pNow - p10s)/10) * 0.4);
+
+                document.getElementById('target-3s').innerText = (pNow + blendedVel * 3).toFixed(2);
+                document.getElementById('target-5s').innerText = (pNow + blendedVel * 5).toFixed(2);
+                document.getElementById('target-10s').innerText = (pNow + blendedVel * 10).toFixed(2);
+            }
+        };
+    }
 
     function updateTimer() {
         const now = new Date();
         const mins = now.getMinutes();
-        const next15 = Math.ceil((mins + 1) / 15) * 15;
+        const intervalMins = currentAsset === 'BTC' ? 60 : 15;
+        const nextTime = Math.ceil((mins + 1) / intervalMins) * intervalMins;
         const targetDate = new Date(now);
-        targetDate.setMinutes(next15, 0, 0);
+        targetDate.setMinutes(nextTime, 0, 0);
 
         const diffSecs = Math.floor((targetDate - now) / 1000);
         const m = Math.floor(diffSecs / 60);
         const s = diffSecs % 60;
 
-        document.getElementById('timer').innerText = 
-            `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        document.getElementById('timer').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         document.getElementById('vencimiento-str').innerText = targetDate.toLocaleTimeString();
     }
+
     setInterval(updateTimer, 1000);
+    initAssetData();
     updateTimer();
 </script>
 
