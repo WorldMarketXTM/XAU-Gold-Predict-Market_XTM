@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorldMarketXTM - Multi-Asset Volatility Predict</title>
+    <title>WorldMarketXTM - Dashboard Multipantalla (BTC / XAU / SNDK)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
@@ -11,75 +11,57 @@
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body {
-            background-color: #f5f5f7;
+            background-color: #f0f2f5;
             color: #1e2329;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             margin: 0;
             padding: 20px;
         }
+        
+        .header-title-main {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header-title-main h1 {
+            margin: 0;
+            font-size: 1.8em;
+            color: #7042e4;
+            font-weight: 800;
+        }
+        .header-title-main p {
+            margin: 4px 0 0 0;
+            font-size: 0.9em;
+            color: #64748b;
+        }
+
+        /* Contenedor Grid para las 3 Tarjetas en Paralelo */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
         .app-card {
             background-color: #ffffff;
-            width: 600px;
-            padding: 24px;
+            padding: 20px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
             border: 1px solid #eaeaea;
+            display: flex;
+            flex-direction: column;
         }
-        .top-header {
+
+        .card-top-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-        }
-        .brand-logo {
-            font-size: 1.8em;
-            font-weight: 800;
-            color: #7042e4;
-            letter-spacing: -0.5px;
-        }
-        .badge-clasico {
-            border: 1px solid #d0d5dd;
-            color: #475467;
-            font-size: 0.8em;
-            padding: 4px 12px;
-            border-radius: 16px;
-            background: #fff;
-        }
-
-        /* Selector de Activos (Pestañas) */
-        .asset-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            background: #f1f5f9;
-            padding: 4px;
-            border-radius: 12px;
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.85em;
-            cursor: pointer;
-            background: transparent;
-            color: #64748b;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            background: #ffffff;
-            color: #0f172a;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            margin-bottom: 10px;
         }
 
         .market-title {
-            font-size: 1.25em;
+            font-size: 1.15em;
             font-weight: 700;
-            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -95,115 +77,116 @@
             font-size: 0.75em;
             color: #fff;
         }
+
         .vencimiento-text {
-            font-size: 0.82em;
+            font-size: 0.8em;
             color: #667085;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
         }
 
         .prices-grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 6px;
+            margin-bottom: 12px;
             background: #f8fafc;
-            padding: 12px;
+            padding: 10px;
             border-radius: 12px;
             text-align: center;
             border: 1px solid #e2e8f0;
         }
         .price-col-title {
-            font-size: 0.72em;
+            font-size: 0.68em;
             color: #64748b;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             text-transform: uppercase;
             font-weight: 600;
         }
-        .val-initial { color: #d97706; font-size: 1.1em; font-weight: 800; }
-        .val-current { color: #ea580c; font-size: 1.15em; font-weight: 800; }
-        .val-delta   { color: #dc2626; font-size: 1.1em; font-weight: 800; }
+        .val-initial { color: #d97706; font-size: 1em; font-weight: 800; }
+        .val-current { color: #ea580c; font-size: 1.05em; font-weight: 800; }
+        .val-delta   { color: #dc2626; font-size: 1em; font-weight: 800; }
 
         .calc-panel {
             background-color: #0f172a;
             border: 1px solid #334155;
             border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 16px;
+            padding: 10px;
+            margin-bottom: 12px;
         }
         .calc-panel-title {
-            font-size: 0.72em;
+            font-size: 0.68em;
             color: #94a3b8;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
         }
         .calc-targets-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 6px;
             text-align: center;
         }
         .calc-item {
             background: #1e293b;
-            padding: 8px 4px;
-            border-radius: 8px;
+            padding: 6px 2px;
+            border-radius: 6px;
             border: 1px solid #334155;
         }
         .calc-label {
-            font-size: 0.68em;
+            font-size: 0.65em;
             color: #94a3b8;
             margin-bottom: 2px;
         }
         .calc-num {
             font-family: 'Share Tech Mono', monospace;
-            font-size: 1.15em;
+            font-size: 1em;
             font-weight: 700;
-            letter-spacing: 0.5px;
         }
         .target-white { color: #ffffff; }
         .target-pink  { color: #f472b6; }
         .target-green { color: #4ade80; }
 
         .chart-section-title {
-            font-size: 0.75em;
+            font-size: 0.7em;
             color: #64748b;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             text-transform: uppercase;
             font-weight: 600;
         }
         .chart-box {
             position: relative;
-            height: 155px;
+            height: 125px;
             width: 100%;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
             background: #ffffff;
-            border-radius: 12px;
-            padding: 8px;
+            border-radius: 10px;
+            padding: 4px;
             border: 1px solid #e2e8f0;
         }
 
         .options-container {
             display: flex;
-            gap: 12px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: auto;
         }
         .opt-btn {
             flex: 1;
             background-color: #f1f5f9;
             border: 1px solid #cbd5e1;
-            border-radius: 12px;
-            padding: 14px;
+            border-radius: 10px;
+            padding: 10px;
             text-align: center;
             transition: all 0.2s ease;
         }
         .opt-btn .btn-text {
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: 400;
-            letter-spacing: 1px;
         }
         .opt-btn .btn-num {
-            font-size: 1.3em;
+            font-size: 1.15em;
             font-weight: 800;
             margin-top: 2px;
         }
@@ -212,11 +195,11 @@
 
         @keyframes flash-green-light {
             0%, 100% { background-color: #f1f5f9; box-shadow: none; }
-            50% { background-color: rgba(16, 185, 129, 0.25); border-color: #10b981; box-shadow: 0 0 15px #10b981; }
+            50% { background-color: rgba(16, 185, 129, 0.25); border-color: #10b981; box-shadow: 0 0 12px #10b981; }
         }
         @keyframes flash-red-light {
             0%, 100% { background-color: #f1f5f9; box-shadow: none; }
-            50% { background-color: rgba(239, 68, 68, 0.25); border-color: #ef4444; box-shadow: 0 0 15px #ef4444; }
+            50% { background-color: rgba(239, 68, 68, 0.25); border-color: #ef4444; box-shadow: 0 0 12px #ef4444; }
         }
         .alert-up-active { animation: flash-green-light 0.8s infinite; }
         .alert-down-active { animation: flash-red-light 0.8s infinite; }
@@ -224,183 +207,205 @@
 </head>
 <body>
 
-<div class="app-card">
-    <div class="top-header">
-        <span>←</span>
-        <div class="brand-logo">predict</div>
-        <span class="badge-clasico">Clásico</span>
-    </div>
+<div class="header-title-main">
+    <h1>predict - Panel Multipantalla</h1>
+    <p>Monitoreo Cuantitativo en Tiempo Real de Volatilidad Cripto y RWA</p>
+</div>
 
-    <!-- Pestañas para cambiar entre activos -->
-    <div class="asset-tabs">
-        <button class="tab-btn active" onclick="switchAsset('BTC')">₿ BITCOIN</button>
-        <button class="tab-btn" onclick="switchAsset('XAU')">🟡 ORO (XAU)</button>
-        <button class="tab-btn" onclick="switchAsset('SNDK')">💾 SANDISK</button>
-    </div>
+<div class="dashboard-grid">
 
-    <div class="market-title">
-        <span class="asset-icon" id="asset-icon" style="background:#f7931a;">₿</span>
-        <span id="asset-title-text">BTC Up or Down 1h</span>
-    </div>
-
-    <div class="vencimiento-text">
-        Fecha de vencimiento: <strong id="vencimiento-str">--:--:--</strong> | Cuenta Regresiva: <span id="timer" style="color: #ef4444; font-weight:800; font-family:'Orbitron', monospace;">--:--</span>
-    </div>
-
-    <div class="prices-grid-3">
-        <div>
-            <div class="price-col-title">Precio Inicial</div>
-            <div class="val-initial" id="base-price">...</div>
-        </div>
-        <div>
-            <div class="price-col-title">Precio Actual</div>
-            <div class="val-current" id="current-price">$0.00</div>
-        </div>
-        <div>
-            <div class="price-col-title">Diferencia</div>
-            <div class="val-delta" id="delta-val">$0.00</div>
-        </div>
-    </div>
-
-    <div class="calc-panel">
-        <div class="calc-panel-title">
-            <span>Algoritmo Cuantitativo (Filtro Anti-Ruido)</span>
-            <span id="trend-indicator" style="color: #94a3b8;">Estable</span>
-        </div>
-        <div class="calc-targets-grid">
-            <div class="calc-item">
-                <div class="calc-label">Target (+3s)</div>
-                <div class="calc-num target-white" id="target-3s">0.00</div>
+    <!-- 1. TARJETA BITCOIN -->
+    <div class="app-card" id="card-btc">
+        <div class="card-top-header">
+            <div class="market-title">
+                <span class="asset-icon" style="background:#f7931a;">₿</span> BTC Up or Down 1h
             </div>
-            <div class="calc-item">
-                <div class="calc-label">Target (+5s)</div>
-                <div class="calc-num target-pink" id="target-5s">0.00</div>
-            </div>
-            <div class="calc-item">
-                <div class="calc-label">Target (+10s)</div>
-                <div class="calc-num target-green" id="target-10s">0.00</div>
+            <span style="font-size: 0.75em; font-weight:700; color:#7042e4;">Clásico</span>
+        </div>
+        <div class="vencimiento-text">
+            <span>Vence: <strong id="btc-venc">--:--:--</strong></span>
+            <span>Cuenta Regresiva: <strong id="btc-timer" style="color:#ef4444; font-family:'Orbitron', monospace;">--:--</strong></span>
+        </div>
+        <div class="prices-grid-3">
+            <div><div class="price-col-title">Inicial</div><div class="val-initial" id="btc-base">...</div></div>
+            <div><div class="price-col-title">Actual</div><div class="val-current" id="btc-curr">$0.00</div></div>
+            <div><div class="price-col-title">Diferencia</div><div class="val-delta" id="btc-delta">$0.00</div></div>
+        </div>
+        <div class="calc-panel">
+            <div class="calc-panel-title"><span>Target Proyectivo</span><span id="btc-trend" style="color:#94a3b8;">Estable</span></div>
+            <div class="calc-targets-grid">
+                <div class="calc-item"><div class="calc-label">+3s</div><div class="calc-num target-white" id="btc-t3">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+5s</div><div class="calc-num target-pink" id="btc-t5">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+10s</div><div class="calc-num target-green" id="btc-t10">0.00</div></div>
             </div>
         </div>
-    </div>
-
-    <div class="chart-section-title">Gráfica en Vivo (Segundos / Ticks)</div>
-    <div class="chart-box">
-        <canvas id="secChart"></canvas>
-    </div>
-
-    <div class="chart-section-title">Gráfica Extendida (Por Minutos)</div>
-    <div class="chart-box">
-        <canvas id="minChart"></canvas>
-    </div>
-
-    <div class="options-container">
-        <div class="opt-btn up-btn" id="btn-up">
-            <div class="btn-text">UP</div>
-            <div class="btn-num" id="btn-up-num">+375.00</div>
-        </div>
-        <div class="opt-btn down-btn" id="btn-down">
-            <div class="btn-text">DOWN</div>
-            <div class="btn-num" id="btn-down-num">-375.00</div>
+        <div class="chart-section-title">En Vivo (Segundos)</div>
+        <div class="chart-box"><canvas id="btcSecChart"></canvas></div>
+        <div class="chart-section-title">Extendida (Minutos)</div>
+        <div class="chart-box"><canvas id="btcMinChart"></canvas></div>
+        <div class="options-container">
+            <div class="opt-btn up-btn" id="btc-btn-up"><div class="btn-text">UP</div><div class="btn-num">+375.00</div></div>
+            <div class="opt-btn down-btn" id="btc-btn-down"><div class="btn-text">DOWN</div><div class="btn-num">-375.00</div></div>
         </div>
     </div>
+
+    <!-- 2. TARJETA ORO (XAU) -->
+    <div class="app-card" id="card-xau">
+        <div class="card-top-header">
+            <div class="market-title">
+                <span class="asset-icon" style="background:#f59e0b;">Au</span> XAU Up or Down 15m
+            </div>
+            <span style="font-size: 0.75em; font-weight:700; color:#7042e4;">Clásico</span>
+        </div>
+        <div class="vencimiento-text">
+            <span>Vence: <strong id="xau-venc">--:--:--</strong></span>
+            <span>Cuenta Regresiva: <strong id="xau-timer" style="color:#ef4444; font-family:'Orbitron', monospace;">--:--</strong></span>
+        </div>
+        <div class="prices-grid-3">
+            <div><div class="price-col-title">Inicial</div><div class="val-initial" id="xau-base">...</div></div>
+            <div><div class="price-col-title">Actual</div><div class="val-current" id="xau-curr">$0.00</div></div>
+            <div><div class="price-col-title">Diferencia</div><div class="val-delta" id="xau-delta">$0.00</div></div>
+        </div>
+        <div class="calc-panel">
+            <div class="calc-panel-title"><span>Target Proyectivo</span><span id="xau-trend" style="color:#94a3b8;">Estable</span></div>
+            <div class="calc-targets-grid">
+                <div class="calc-item"><div class="calc-label">+3s</div><div class="calc-num target-white" id="xau-t3">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+5s</div><div class="calc-num target-pink" id="xau-t5">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+10s</div><div class="calc-num target-green" id="xau-t10">0.00</div></div>
+            </div>
+        </div>
+        <div class="chart-section-title">En Vivo (Segundos)</div>
+        <div class="chart-box"><canvas id="xauSecChart"></canvas></div>
+        <div class="chart-section-title">Extendida (Minutos)</div>
+        <div class="chart-box"><canvas id="xauMinChart"></canvas></div>
+        <div class="options-container">
+            <div class="opt-btn up-btn" id="xau-btn-up"><div class="btn-text">UP</div><div class="btn-num">+2.00</div></div>
+            <div class="opt-btn down-btn" id="xau-btn-down"><div class="btn-text">DOWN</div><div class="btn-num">-2.00</div></div>
+        </div>
+    </div>
+
+    <!-- 3. TARJETA SANDISK (SNDK) -->
+    <div class="app-card" id="card-sndk">
+        <div class="card-top-header">
+            <div class="market-title">
+                <span class="asset-icon" style="background:#7042e4;">SD</span> SNDK Up or Down 15m
+            </div>
+            <span style="font-size: 0.75em; font-weight:700; color:#7042e4;">Clásico</span>
+        </div>
+        <div class="vencimiento-text">
+            <span>Vence: <strong id="sndk-venc">--:--:--</strong></span>
+            <span>Cuenta Regresiva: <strong id="sndk-timer" style="color:#ef4444; font-family:'Orbitron', monospace;">--:--</strong></span>
+        </div>
+        <div class="prices-grid-3">
+            <div><div class="price-col-title">Inicial</div><div class="val-initial" id="sndk-base">...</div></div>
+            <div><div class="price-col-title">Actual</div><div class="val-current" id="sndk-curr">$0.00</div></div>
+            <div><div class="price-col-title">Diferencia</div><div class="val-delta" id="sndk-delta">$0.00</div></div>
+        </div>
+        <div class="calc-panel">
+            <div class="calc-panel-title"><span>Target Proyectivo</span><span id="sndk-trend" style="color:#94a3b8;">Estable</span></div>
+            <div class="calc-targets-grid">
+                <div class="calc-item"><div class="calc-label">+3s</div><div class="calc-num target-white" id="sndk-t3">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+5s</div><div class="calc-num target-pink" id="sndk-t5">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+10s</div><div class="calc-num target-green" id="sndk-t10">0.00</div></div>
+            </div>
+        </div>
+        <div class="chart-section-title">En Vivo (Segundos)</div>
+        <div class="chart-box"><canvas id="sndkSecChart"></canvas></div>
+        <div class="chart-section-title">Extendida (Minutos)</div>
+        <div class="chart-box"><canvas id="sndkMinChart"></canvas></div>
+        <div class="options-container">
+            <div class="opt-btn up-btn" id="sndk-btn-up"><div class="btn-text">UP</div><div class="btn-num">+3.00</div></div>
+            <div class="opt-btn down-btn" id="sndk-btn-down"><div class="btn-text">DOWN</div><div class="btn-num">-3.00</div></div>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    const CONFIG = {
-        BTC: { symbol: 'btcusdt', name: 'BTC Up or Down 1h', interval: '1h', threshold: 375.0, icon: '₿', iconBg: '#f7931a', color: '#f7931a' },
-        XAU: { symbol: 'paxgusdt', name: 'XAU Up or Down 15m', interval: '15m', threshold: 2.0, icon: 'Au', iconBg: '#f59e0b', color: '#f59e0b' },
-        SNDK: { symbol: 'sndkusdt', name: 'SNDK Up or Down 15m', interval: '15m', threshold: 3.0, icon: 'SD', iconBg: '#7042e4', color: '#7042e4' }
+    // Configuración general de los 3 activos
+    const ASSETS = {
+        btc:  { symbol: 'btcusdt',  interval: '1h',  threshold: 375.0, color: '#f7931a' },
+        xau:  { symbol: 'paxgusdt', interval: '15m', threshold: 2.0,   color: '#f59e0b' },
+        sndk: { symbol: 'sndkusdt', interval: '15m', threshold: 3.0,   color: '#7042e4' }
     };
 
-    let currentAsset = 'BTC';
-    let basePrice = null;
-    let ws = null;
+    // Estructuras de datos independientes por activo
+    const state = {
+        btc:  { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null },
+        xau:  { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null },
+        sndk: { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null }
+    };
 
-    let secPrices = [];
-    let secLabels = [];
-    let minPrices = [];
-    let minLabels = [];
-    let lastMinuteRecorded = null;
-
-    const ctxSec = document.getElementById('secChart').getContext('2d');
-    const secChart = new Chart(ctxSec, {
-        type: 'line',
-        data: { labels: secLabels, datasets: [{ data: secPrices, borderColor: '#f7931a', borderWidth: 1.8, pointRadius: 0, stepped: true }] },
-        options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } } }, y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } }, position: 'right' } }, plugins: { legend: { display: false } } }
-    });
-
-    const ctxMin = document.getElementById('minChart').getContext('2d');
-    const minChart = new Chart(ctxMin, {
-        type: 'line',
-        data: { labels: minLabels, datasets: [{ data: minPrices, borderColor: '#7042e4', borderWidth: 1.8, pointRadius: 0, tension: 0.1 }] },
-        options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } } }, y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } }, position: 'right' } }, plugins: { legend: { display: false } } }
-    });
-
-    function switchAsset(assetKey) {
-        currentAsset = assetKey;
-        const cfg = CONFIG[assetKey];
-
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-
-        document.getElementById('asset-title-text').innerText = cfg.name;
-        const iconElem = document.getElementById('asset-icon');
-        iconElem.innerText = cfg.icon;
-        iconElem.style.background = cfg.iconBg;
-
-        document.getElementById('btn-up-num').innerText = `+${cfg.threshold.toFixed(2)}`;
-        document.getElementById('btn-down-num').innerText = `-${cfg.threshold.toFixed(2)}`;
-
-        secChart.data.datasets[0].borderColor = cfg.color;
-
-        secPrices = []; secLabels = [];
-        minPrices = []; minLabels = [];
-        secChart.update(); minChart.update();
-
-        initAssetData();
+    // Inicializador de Gráficas Chart.js
+    function createChart(ctxId, color, isStepped = false) {
+        return new Chart(document.getElementById(ctxId).getContext('2d'), {
+            type: 'line',
+            data: { labels: [], datasets: [{ data: [], borderColor: color, borderWidth: 1.8, pointRadius: 0, stepped: isStepped }] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 7 } } },
+                    y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 7 } }, position: 'right' }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
     }
 
-    async function initAssetData() {
-        const cfg = CONFIG[currentAsset];
-        if (ws) ws.close();
+    const charts = {
+        btcSec:  createChart('btcSecChart', ASSETS.btc.color, true),
+        btcMin:  createChart('btcMinChart', '#7042e4'),
+        xauSec:  createChart('xauSecChart', ASSETS.xau.color, true),
+        xauMin:  createChart('xauMinChart', '#7042e4'),
+        sndkSec: createChart('sndkSecChart', ASSETS.sndk.color, true),
+        sndkMin: createChart('sndkMinChart', '#f7931a')
+    };
+
+    // Cargar precios iniciales e histórico desde Binance
+    async function initAsset(key) {
+        const cfg = ASSETS[key];
+        const st = state[key];
 
         try {
-            const resInit = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
-            const dataInit = await resInit.json();
-            basePrice = parseFloat(dataInit[0][1]);
-            document.getElementById('base-price').innerText = `$${basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            const resBase = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
+            const dataBase = await resBase.json();
+            st.basePrice = parseFloat(dataBase[0][1]);
+            document.getElementById(`${key}-base`).innerText = `$${st.basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
             const res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=1m&limit=60`);
             const data1m = await res1m.json();
 
-            minPrices = []; minLabels = [];
+            st.minP = []; st.minL = [];
             data1m.forEach(candle => {
-                minPrices.push(parseFloat(candle[4]));
-                minLabels.push(new Date(candle[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                st.minP.push(parseFloat(candle[4]));
+                st.minL.push(new Date(candle[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
             });
-            minChart.data.labels = minLabels;
-            minChart.data.datasets[0].data = minPrices;
-            minChart.update();
+            charts[`${key}Min`].data.labels = st.minL;
+            charts[`${key}Min`].data.datasets[0].data = st.minP;
+            charts[`${key}Min`].update();
         } catch (e) {
-            console.error("Error al cargar datos base:", e);
+            console.error(`Error cargando ${key}:`, e);
         }
 
-        ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.symbol}@ticker`);
+        // Conectar WebSocket
+        const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.symbol}@ticker`);
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const price = parseFloat(data.c);
-            if (!basePrice) return;
+            if (!st.basePrice) return;
 
-            const delta = price - basePrice;
+            const delta = price - st.basePrice;
             const sign = delta >= 0 ? "+" : "";
 
-            document.getElementById('current-price').innerText = `$${price.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-            const deltaElem = document.getElementById('delta-val');
+            document.getElementById(`${key}-curr`).innerText = `$${price.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            const deltaElem = document.getElementById(`${key}-delta`);
             deltaElem.innerText = `${sign}$${delta.toFixed(2)}`;
             deltaElem.style.color = delta >= 0 ? "#10b981" : "#ef4444";
 
-            const btnUp = document.getElementById('btn-up');
-            const btnDown = document.getElementById('btn-down');
+            // Alertas intermitentes UP / DOWN
+            const btnUp = document.getElementById(`${key}-btn-up`);
+            const btnDown = document.getElementById(`${key}-btn-down`);
             if (delta >= cfg.threshold) {
                 btnUp.classList.add('alert-up-active'); btnDown.classList.remove('alert-down-active');
             } else if (delta <= -cfg.threshold) {
@@ -409,55 +414,37 @@
                 btnUp.classList.remove('alert-up-active'); btnDown.classList.remove('alert-down-active');
             }
 
+            // Gráfica Segundos
             const now = new Date();
-            secPrices.push(price);
-            secLabels.push(now.toLocaleTimeString());
-            if (secPrices.length > 60) { secPrices.shift(); secLabels.shift(); }
-            secChart.update();
+            st.secP.push(price);
+            st.secL.push(now.toLocaleTimeString());
+            if (st.secP.length > 50) { st.secP.shift(); st.secL.shift(); }
+            charts[`${key}Sec`].data.labels = st.secL;
+            charts[`${key}Sec`].data.datasets[0].data = st.secP;
+            charts[`${key}Sec`].update();
 
+            // Gráfica Minutos
             const minTimeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            if (lastMinuteRecorded !== minTimeStr) {
-                lastMinuteRecorded = minTimeStr;
-                minPrices.push(price); minLabels.push(minTimeStr);
-                if (minPrices.length > 60) { minPrices.shift(); minLabels.shift(); }
-            } else if (minPrices.length > 0) {
-                minPrices[minPrices.length - 1] = price;
+            if (st.lastMin !== minTimeStr) {
+                st.lastMin = minTimeStr;
+                st.minP.push(price); st.minL.push(minTimeStr);
+                if (st.minP.length > 60) { st.minP.shift(); st.minL.shift(); }
+            } else if (st.minP.length > 0) {
+                st.minP[st.minP.length - 1] = price;
             }
-            minChart.update();
+            charts[`${key}Min`].update();
 
-            if (secPrices.length > 15) {
+            // Algoritmo Cuantitativo Multi-Horizonte (+3s, +5s, +10s)
+            if (st.secP.length > 15) {
                 const pNow = price;
-                const p3s = secPrices[secPrices.length - 4];
-                const p10s = secPrices[secPrices.length - 15];
+                const p3s = st.secP[st.secP.length - 4];
+                const p10s = st.secP[st.secP.length - 15];
                 const blendedVel = (((pNow - p3s)/3) * 0.6) + (((pNow - p10s)/10) * 0.4);
 
-                document.getElementById('target-3s').innerText = (pNow + blendedVel * 3).toFixed(2);
-                document.getElementById('target-5s').innerText = (pNow + blendedVel * 5).toFixed(2);
-                document.getElementById('target-10s').innerText = (pNow + blendedVel * 10).toFixed(2);
-            }
-        };
-    }
+                document.getElementById(`${key}-t3`).innerText = (pNow + blendedVel * 3).toFixed(2);
+                document.getElementById(`${key}-t5`).innerText = (pNow + blendedVel * 5).toFixed(2);
+                document.getElementById(`${key}-t10`).innerText = (pNow + blendedVel * 10).toFixed(2);
 
-    function updateTimer() {
-        const now = new Date();
-        const mins = now.getMinutes();
-        const intervalMins = currentAsset === 'BTC' ? 60 : 15;
-        const nextTime = Math.ceil((mins + 1) / intervalMins) * intervalMins;
-        const targetDate = new Date(now);
-        targetDate.setMinutes(nextTime, 0, 0);
-
-        const diffSecs = Math.floor((targetDate - now) / 1000);
-        const m = Math.floor(diffSecs / 60);
-        const s = diffSecs % 60;
-
-        document.getElementById('timer').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-        document.getElementById('vencimiento-str').innerText = targetDate.toLocaleTimeString();
-    }
-
-    setInterval(updateTimer, 1000);
-    initAssetData();
-    updateTimer();
-</script>
-
-</body>
-</html>
+                const trendElem = document.getElementById(`${key}-trend`);
+                if (blendedVel > 0.02) { trendElem.innerText = "Alcista 🚀"; trendElem.style.color = "#10b981"; }
+                else if (blendedVel < -0.02) { trendElem.innerText = "Bajista 🔻"; trendElem.style.color = "#ef4444
