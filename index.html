@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XAU-Gold-Volatility-Market_XTM - predict</title>
-    <!-- Tipografías de estilo Calculadora y Chart.js -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
@@ -38,7 +37,7 @@
         .brand-logo {
             font-size: 1.8em;
             font-weight: 800;
-            color: #7042e4; /* Morado Predict */
+            color: #7042e4;
             letter-spacing: -0.5px;
         }
         .badge-clasico {
@@ -58,7 +57,7 @@
             gap: 8px;
         }
         .xau-icon {
-            background: #f59e0b; /* Color Oro */
+            background: #f59e0b;
             color: #fff;
             width: 26px;
             height: 26px;
@@ -74,8 +73,6 @@
             color: #667085;
             margin-bottom: 15px;
         }
-
-        /* 3 columnas de precios */
         .prices-grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -94,11 +91,10 @@
             text-transform: uppercase;
             font-weight: 600;
         }
-        .val-initial { color: #d97706; font-size: 1.1em; font-weight: 800; } /* Dorado oscuro */
-        .val-current { color: #ea580c; font-size: 1.15em; font-weight: 800; } /* Naranja fuerte */
-        .val-delta   { color: #dc2626; font-size: 1.1em; font-weight: 800; } /* Rojo */
-
-        /* Panel Calculadora para los 3 Targets Proyectivos */
+        .val-initial { color: #d97706; font-size: 1.1em; font-weight: 800; }
+        .val-current { color: #ea580c; font-size: 1.15em; font-weight: 800; }
+        .val-delta   { color: #dc2626; font-size: 1.1em; font-weight: 800; }
+        
         .calc-panel {
             background-color: #0f172a;
             border: 1px solid #334155;
@@ -141,7 +137,6 @@
         .target-pink  { color: #f472b6; }
         .target-green { color: #4ade80; }
 
-        /* Gráficas */
         .chart-section-title {
             font-size: 0.75em;
             color: #64748b;
@@ -159,8 +154,6 @@
             padding: 8px;
             border: 1px solid #e2e8f0;
         }
-
-        /* Botones UP y DOWN Estilo Claro */
         .options-container {
             display: flex;
             gap: 12px;
@@ -217,7 +210,6 @@
         Fecha de vencimiento: <strong id="vencimiento-str">--:--:--</strong> | Cuenta Regresiva: <span id="timer" style="color: #ef4444; font-weight:800; font-family:'Orbitron', monospace;">--:--</span>
     </div>
 
-    <!-- Precios -->
     <div class="prices-grid-3">
         <div>
             <div class="price-col-title">Precio Inicial</div>
@@ -233,10 +225,9 @@
         </div>
     </div>
 
-    <!-- 3 Algoritmos Proyectivos (Calculadora) -->
     <div class="calc-panel">
         <div class="calc-panel-title">
-            <span>Precios Proyectivos (Aceleración y Velocidad)</span>
+            <span>Algoritmo Cuántico (Filtro Anti-Ruido)</span>
             <span id="trend-indicator" style="color: #94a3b8;">Estable</span>
         </div>
         <div class="calc-targets-grid">
@@ -255,19 +246,16 @@
         </div>
     </div>
 
-    <!-- Gráfica 1: Segundos -->
     <div class="chart-section-title">Gráfica en Vivo (Segundos / Ticks)</div>
     <div class="chart-box">
         <canvas id="secChart"></canvas>
     </div>
 
-    <!-- Gráfica 2: Minutos -->
     <div class="chart-section-title">Gráfica Extendida (Por Minutos)</div>
     <div class="chart-box">
         <canvas id="minChart"></canvas>
     </div>
 
-    <!-- Botones UP y DOWN -->
     <div class="options-container">
         <div class="opt-btn up-btn" id="btn-up">
             <div class="btn-text">UP</div>
@@ -282,16 +270,14 @@
 
 <script>
     let basePrice = null;
-    const THRESHOLD = 2.0; // Umbral de $2.00 para el oro
+    const THRESHOLD = 2.0;
 
     let secPrices = [];
     let secLabels = [];
-
     let minPrices = [];
     let minLabels = [];
     let lastMinuteRecorded = null;
 
-    // Gráfica de Segundos
     const ctxSec = document.getElementById('secChart').getContext('2d');
     const secChart = new Chart(ctxSec, {
         type: 'line',
@@ -317,7 +303,6 @@
         }
     });
 
-    // Gráfica de Minutos
     const ctxMin = document.getElementById('minChart').getContext('2d');
     const minChart = new Chart(ctxMin, {
         type: 'line',
@@ -342,7 +327,6 @@
         }
     });
 
-    // Cargar precio inicial y datos históricos de 15m/1m de PAXGUSDT
     async function loadBinanceData() {
         try {
             const res15m = await fetch('https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=15m&limit=1');
@@ -371,7 +355,6 @@
     loadBinanceData();
     setInterval(loadBinanceData, 30000);
 
-    // WebSocket Binance Oro (PAXGUSDT)
     const ws = new WebSocket("wss://stream.binance.com:9443/ws/paxgusdt@ticker");
 
     ws.onmessage = (event) => {
@@ -388,7 +371,6 @@
         deltaElem.innerText = `${sign}$${delta.toFixed(2)}`;
         deltaElem.style.color = delta >= 0 ? "#10b981" : "#ef4444";
 
-        // Alertas intermitentes botones UP / DOWN
         const btnUp = document.getElementById('btn-up');
         const btnDown = document.getElementById('btn-down');
 
@@ -428,38 +410,40 @@
         }
         minChart.update();
 
-        // Algoritmos Proyectivos (+3s, +5s, +10s)
-        if (secPrices.length > 15) {
+        // Algoritmo Cuantitativo Mejorado (Suavizado de Inercia y Supresión de Ruido)
+        if (secPrices.length > 20) {
             const pNow = price;
-            const p5s = secPrices[secPrices.length - 6];
+            // Ventanas ponderadas exponenciales para filtrar ruido local
+            const p3s = secPrices[secPrices.length - 4];
             const p10s = secPrices[secPrices.length - 15];
 
-            const vel3 = (pNow - p5s) / 5;
-            const vel5 = (pNow - p10s) / 10;
+            const alpha = 0.6; // Factor de amortiguación para evitar falsos positivos
+            const velRaw = (pNow - p3s) / 3;
+            const velSmooth = (pNow - p10s) / 10;
+            const blendedVel = (velRaw * alpha) + (velSmooth * (1 - alpha));
 
-            const target3s = pNow + (vel3 * 3);
-            const target5s = pNow + (vel5 * 5);
-            const target10s = pNow + (vel5 * 10);
+            const target3s = pNow + (blendedVel * 3);
+            const target5s = pNow + (blendedVel * 5);
+            const target10s = pNow + (blendedVel * 10);
 
             document.getElementById('target-3s').innerText = target3s.toFixed(2);
             document.getElementById('target-5s').innerText = target5s.toFixed(2);
             document.getElementById('target-10s').innerText = target10s.toFixed(2);
 
             const trendIndicator = document.getElementById('trend-indicator');
-            if (vel3 > 0.05) {
-                trendIndicator.innerText = "Impulso Alcista 🚀";
+            if (blendedVel > 0.03) {
+                trendIndicator.innerText = "Tendencia Alcista 🚀";
                 trendIndicator.style.color = "#10b981";
-            } else if (vel3 < -0.05) {
-                trendIndicator.innerText = "Impulso Bajista 🔻";
+            } else if (blendedVel < -0.03) {
+                trendIndicator.innerText = "Tendencia Bajista 🔻";
                 trendIndicator.style.color = "#ef4444";
             } else {
-                trendIndicator.innerText = "Inercia Estable ⚖️";
+                trendIndicator.innerText = "Filtro de Ruido (Estable) ⚖️";
                 trendIndicator.style.color = "#94a3b8";
             }
         }
     };
 
-    // Temporizador de 15 minutos
     function updateTimer() {
         const now = new Date();
         const mins = now.getMinutes();
