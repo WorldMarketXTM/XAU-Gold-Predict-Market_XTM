@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAU Gold Predict - Up or Down 15m</title>
+    <!-- Tipografías de estilo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body {
+            background-color: #f5f5f7;
+            color: #1e2329;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+        }
+        .app-card {
+            background-color: #ffffff;
+            width: 440px;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid #eaeaea;
+        }
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .brand-logo {
+            font-size: 1.8em;
+            font-weight: 800;
+            color: #7042e4; /* Morado Predict */
+            letter-spacing: -0.5px;
+        }
+        .badge-clasico {
+            border: 1px solid #d0d5dd;
+            color: #475467;
+            font-size: 0.8em;
+            padding: 4px 12px;
+            border-radius: 16px;
+            background: #fff;
+        }
+        .market-title {
+            font-size: 1.25em;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .xau-icon {
+            background: #f59e0b; /* Color Oro */
+            color: #fff;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 0.75em;
+        }
+        .vencimiento-text {
+            font-size: 0.82em;
+            color: #667085;
+            margin-bottom: 12px;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 15px;
+        }
+        .price-block-label { font-size: 0.78em; color: #667085; margin-bottom: 4px; }
+        .price-val-init { font-size: 1.1em; font-weight: 700; color: #344054; }
+        .price-val-curr { font-size: 1.25em; font-weight: 800; color: #101828; }
+        .delta-badge { font-size: 0.82em; font-weight: 600; margin-left: 4px; }
+        .delta-up { color: #12b76a; }
+        .delta-down { color: #f04438; }
+        .countdown-block { text-align: right; }
+        .countdown-val {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3em;
+            font-weight: 800;
+            color: #f04438;
+        }
+        .time-pills {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .pill {
+            background: #f2f4f7;
+            border: 1px solid transparent;
+            color: #344054;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .pill.active {
+            background: #ecfdf3;
+            border-color: #12b76a;
+            color: #027a48;
+        }
+        .chart-box {
+            position: relative;
+            height: 180px;
+            width: 100%;
+            margin-bottom: 15px;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 5px;
+        }
+        .target-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .target-title { font-size: 0.78em; color: #64748b; font-weight: 600; }
+        .target-val {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.15em;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .opt-card {
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+            border: 1.5px solid transparent;
+            transition: all 0.2s;
+        }
+        .opt-up { background: #ecfdf3; border-color: #abf5d1; color: #027a48; }
+        .opt-down { background: #fef3f2; border-color: #fecdca; color: #b42318; }
+        .opt-title { font-size: 1.2em; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .opt-sub { font-size: 0.78em; opacity: 0.8; margin-top: 2px; }
+
+        @keyframes flash-green-light {
+            0%, 100% { background: #ecfdf3; }
+            50% { background: #6ee7b7; box-shadow: 0 0 12px #10b981; }
+        }
+        @keyframes flash-red-light {
+            0%, 100% { background: #fef3f2; }
+            50% { background: #fca5a5; box-shadow: 0 0 12px #ef4444; }
+        }
+        .alert-up-light { animation: flash-green-light 0.8s infinite; }
+        .alert-down-light { animation: flash-red-light 0.8s infinite; }
+
+        .amount-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .amt-btn {
+            flex: 1;
+            background: #f2f4f7;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #344054;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+        .main-action-btn {
+            width: 100%;
+            background: #12b76a;
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1.05em;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(18, 183, 106, 0.25);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <div class="top-header">
+        <span>←</span>
+        <div class="brand-logo">predict</div>
+        <span class="badge-clasico">Clásico</span>
+    </div>
+
+    <div class="market-title">
+        <span class="xau-icon">Au</span> XAU Up or Down 15m
+    </div>
+
+    <div class="vencimiento-text">
+        Fecha de vencimiento: <strong id="vencimiento-str">--:--:--</strong>
+    </div>
+
+    <div class="price-row">
+        <div>
+            <div class="price-block-label">Precio inicial</div>
+            <div class="price-val-init" id="base-price">...</div>
+        </div>
+        <div>
+            <div class="price-block-label">Precio actual <span id="delta-badge" class="delta-badge">+$0.00</span></div>
+            <div class="price-val-curr" id="current-price">$0.00</div>
+        </div>
+        <div class="countdown-block">
+            <div class="price-block-label">Cuenta regresiva</div>
+            <div class="countdown-val" id="timer">--:--</div>
+        </div>
+    </div>
+
+    <div class="time-pills">
+        <div class="pill">Pasada ▾</div>
+        <div class="pill active" id="pill-current">--:--</div>
+        <div class="pill" id="pill-next1">--:--</div>
+        <div class="pill" id="pill-next2">--:--</div>
+    </div>
+
+    <div class="chart-box">
+        <canvas id="priceChart"></canvas>
+    </div>
+
+    <div class="target-box">
+        <div>
+            <div class="target-title">Target Proyectado (+3s Inercia)</div>
+            <div class="target-val" id="target-val">$0.00</div>
+        </div>
+        <div style="text-align: right;">
+            <div class="target-title">Umbral Alerta</div>
+            <div style="font-weight: 700; color: #f59e0b;">±$2.00</div>
+        </div>
+    </div>
+
+    <div class="options-grid">
+        <div class="opt-card opt-up" id="btn-up">
+            <div class="opt-title">↗ Up</div>
+            <div class="opt-sub">Meta: +$2.00</div>
+        </div>
+        <div class="opt-card opt-down" id="btn-down">
+            <div class="opt-title">↘ Down</div>
+            <div class="opt-sub">Meta: -$2.00</div>
+        </div>
+    </div>
+
+    <div class="amount-selector">
+        <button class="amt-btn">$1</button>
+        <button class="amt-btn">$5</button>
+        <button class="amt-btn">$10</button>
+        <button class="amt-btn">$50</button>
+    </div>
+
+    <button class="main-action-btn">Comprar Up</button>
+</div>
+
+<script>
+    let basePrice = null;
+    const THRESHOLD = 2.0; // Umbral de $2.00 para el Oro
+    let priceHistory = [];
+    let timeHistory = [];
+
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    const priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timeHistory,
+            datasets: [{
+                data: priceHistory,
+                borderColor: '#f59e0b',
+                borderWidth: 2,
+                pointRadius: 0,
+                stepped: true,
+                tension: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 9 }, maxTicksLimit: 5 } },
+                y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 9 } }, position: 'right' }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    async function fetchBasePrice() {
+        try {
+            const res = await fetch('https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=15m&limit=1');
+            const data = await res.json();
+            basePrice = parseFloat(data[0][1]);
+            document.getElementById('base-price').innerText = `$${basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        } catch (e) {
+            console.error("Error cargando precio base de oro:", e);
+        }
+    }
+    fetchBasePrice();
+    setInterval(fetchBasePrice, 30000);
+
+    const ws = new WebSocket("wss://stream.binance.com:9443/ws/paxgusdt@ticker");
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        const price = parseFloat(data.c);
+        
+        if (basePrice === null) return;
+
+        const delta = price - basePrice;
+        const sign = delta >= 0 ? "+" : "";
+
+        document.getElementById('current-price').innerText = `$${price.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        const badge = document.getElementById('delta-badge');
+        badge.innerText = `${sign}$${delta.toFixed(2)}`;
+        badge.className = `delta-badge ${delta >= 0 ? 'delta-up' : 'delta-down'}`;
+
+        const cardUp = document.getElementById('btn-up');
+        const cardDown = document.getElementById('btn-down');
+        if (delta >= THRESHOLD) {
+            cardUp.classList.add('alert-up-light');
+            cardDown.classList.remove('alert-down-light');
+        } else if (delta <= -THRESHOLD) {
+            cardDown.classList.add('alert-down-light');
+            cardUp.classList.remove('alert-up-light');
+        } else {
+            cardUp.classList.remove('alert-up-light');
+            cardDown.classList.remove('alert-down-light');
+        }
+
+        priceHistory.push(price);
+        timeHistory.push(new Date().toLocaleTimeString());
+
+        if (priceHistory.length > 50) {
+            priceHistory.shift();
+            timeHistory.shift();
+        }
+
+        if (priceHistory.length > 10) {
+            const pNow = price;
+            const pPast = priceHistory[priceHistory.length - 6];
+            const velocity = (pNow - pPast) / 5;
+            const target3s = pNow + (velocity * 3);
+            document.getElementById('target-val').innerText = `$${target3s.toFixed(2)}`;
+        }
+
+        priceChart.update();
+    };
+
+    function updateTimer() {
+        const now = new Date();
+        const mins = now.getMinutes();
+        const next15 = Math.ceil((mins + 1) / 15) * 15;
+        const targetDate = new Date(now);
+        targetDate.setMinutes(next15, 0, 0);
+
+        const diffSecs = Math.floor((targetDate - now) / 1000);
+        const m = Math.floor(diffSecs / 60);
+        const s = diffSecs % 60;
+
+        document.getElementById('timer').innerText = 
+            `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        document.getElementById('vencimiento-str').innerText = targetDate.toLocaleTimeString();
+
+        document.getElementById('pill-current').innerText = `${now.getHours()}:${String(Math.floor(mins/15)*15).padStart(2,'0')}`;
+        document.getElementById('pill-next1').innerText = `${now.getHours()}:${String((Math.floor(mins/15)*15 + 15)%60).padStart(2,'0')}`;
+        document.getElementById('pill-next2').innerText = `${now.getHours()}:${String((Math.floor(mins/15)*15 + 30)%60).padStart(2,'0')}`;
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+</script>
+
+</body>
+</html>
