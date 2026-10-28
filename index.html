@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XAU Gold Predict - Up or Down 15m</title>
-    <!-- Tipografías de estilo -->
+    <title>XAU-Gold-Volatility-Market_XTM - predict</title>
+    <!-- Tipografías de estilo Calculadora y Chart.js -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
@@ -19,12 +19,12 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 15px;
+            padding: 20px;
         }
         .app-card {
             background-color: #ffffff;
-            width: 440px;
-            padding: 20px;
+            width: 580px;
+            padding: 24px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             border: 1px solid #eaeaea;
@@ -52,7 +52,7 @@
         .market-title {
             font-size: 1.25em;
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -72,131 +72,132 @@
         .vencimiento-text {
             font-size: 0.82em;
             color: #667085;
-            margin-bottom: 12px;
-        }
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
             margin-bottom: 15px;
         }
-        .price-block-label { font-size: 0.78em; color: #667085; margin-bottom: 4px; }
-        .price-val-init { font-size: 1.1em; font-weight: 700; color: #344054; }
-        .price-val-curr { font-size: 1.25em; font-weight: 800; color: #101828; }
-        .delta-badge { font-size: 0.82em; font-weight: 600; margin-left: 4px; }
-        .delta-up { color: #12b76a; }
-        .delta-down { color: #f04438; }
-        .countdown-block { text-align: right; }
-        .countdown-val {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.3em;
-            font-weight: 800;
-            color: #f04438;
-        }
-        .time-pills {
-            display: flex;
-            gap: 6px;
+
+        /* 3 columnas de precios */
+        .prices-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
             margin-bottom: 15px;
-            overflow-x: auto;
-            padding-bottom: 4px;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
         }
-        .pill {
-            background: #f2f4f7;
-            border: 1px solid transparent;
-            color: #344054;
-            padding: 6px 14px;
-            border-radius: 16px;
-            font-size: 0.8em;
+        .price-col-title {
+            font-size: 0.72em;
+            color: #64748b;
+            margin-bottom: 4px;
+            text-transform: uppercase;
             font-weight: 600;
         }
-        .pill.active {
-            background: #ecfdf3;
-            border-color: #12b76a;
-            color: #027a48;
-        }
-        .chart-box {
-            position: relative;
-            height: 180px;
-            width: 100%;
-            margin-bottom: 15px;
-            background: #ffffff;
+        .val-initial { color: #d97706; font-size: 1.1em; font-weight: 800; } /* Dorado oscuro */
+        .val-current { color: #ea580c; font-size: 1.15em; font-weight: 800; } /* Naranja fuerte */
+        .val-delta   { color: #dc2626; font-size: 1.1em; font-weight: 800; } /* Rojo */
+
+        /* Panel Calculadora para los 3 Targets Proyectivos */
+        .calc-panel {
+            background-color: #0f172a;
+            border: 1px solid #334155;
             border-radius: 12px;
-            padding: 5px;
+            padding: 12px;
+            margin-bottom: 16px;
         }
-        .target-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-bottom: 15px;
+        .calc-panel-title {
+            font-size: 0.72em;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
-        .target-title { font-size: 0.78em; color: #64748b; font-weight: 600; }
-        .target-val {
+        .calc-targets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            text-align: center;
+        }
+        .calc-item {
+            background: #1e293b;
+            padding: 8px 4px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        .calc-label {
+            font-size: 0.68em;
+            color: #94a3b8;
+            margin-bottom: 2px;
+        }
+        .calc-num {
             font-family: 'Share Tech Mono', monospace;
             font-size: 1.15em;
             font-weight: 700;
-            color: #0f172a;
+            letter-spacing: 0.5px;
         }
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        .target-white { color: #ffffff; }
+        .target-pink  { color: #f472b6; }
+        .target-green { color: #4ade80; }
+
+        /* Gráficas */
+        .chart-section-title {
+            font-size: 0.75em;
+            color: #64748b;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .chart-box {
+            position: relative;
+            height: 155px;
+            width: 100%;
+            margin-bottom: 14px;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Botones UP y DOWN Estilo Claro */
+        .options-container {
+            display: flex;
             gap: 12px;
-            margin-bottom: 15px;
+            margin-top: 10px;
         }
-        .opt-card {
-            border-radius: 14px;
+        .opt-btn {
+            flex: 1;
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
             padding: 14px;
             text-align: center;
-            border: 1.5px solid transparent;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
-        .opt-up { background: #ecfdf3; border-color: #abf5d1; color: #027a48; }
-        .opt-down { background: #fef3f2; border-color: #fecdca; color: #b42318; }
-        .opt-title { font-size: 1.2em; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .opt-sub { font-size: 0.78em; opacity: 0.8; margin-top: 2px; }
+        .opt-btn .btn-text {
+            font-size: 1.1em;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+        .opt-btn .btn-num {
+            font-size: 1.3em;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+        .up-btn .btn-text, .up-btn .btn-num { color: #10b981; }
+        .down-btn .btn-text, .down-btn .btn-num { color: #ef4444; }
 
         @keyframes flash-green-light {
-            0%, 100% { background: #ecfdf3; }
-            50% { background: #6ee7b7; box-shadow: 0 0 12px #10b981; }
+            0%, 100% { background-color: #f1f5f9; box-shadow: none; }
+            50% { background-color: rgba(16, 185, 129, 0.25); border-color: #10b981; box-shadow: 0 0 15px #10b981; }
         }
         @keyframes flash-red-light {
-            0%, 100% { background: #fef3f2; }
-            50% { background: #fca5a5; box-shadow: 0 0 12px #ef4444; }
+            0%, 100% { background-color: #f1f5f9; box-shadow: none; }
+            50% { background-color: rgba(239, 68, 68, 0.25); border-color: #ef4444; box-shadow: 0 0 15px #ef4444; }
         }
-        .alert-up-light { animation: flash-green-light 0.8s infinite; }
-        .alert-down-light { animation: flash-red-light 0.8s infinite; }
-
-        .amount-selector {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        .amt-btn {
-            flex: 1;
-            background: #f2f4f7;
-            border: none;
-            padding: 8px;
-            border-radius: 8px;
-            font-weight: 700;
-            color: #344054;
-            font-size: 0.85em;
-            cursor: pointer;
-        }
-        .main-action-btn {
-            width: 100%;
-            background: #12b76a;
-            color: #ffffff;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 1.05em;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(18, 183, 106, 0.25);
-        }
+        .alert-up-active { animation: flash-green-light 0.8s infinite; }
+        .alert-down-active { animation: flash-red-light 0.8s infinite; }
     </style>
 </head>
 <body>
@@ -213,82 +214,93 @@
     </div>
 
     <div class="vencimiento-text">
-        Fecha de vencimiento: <strong id="vencimiento-str">--:--:--</strong>
+        Fecha de vencimiento: <strong id="vencimiento-str">--:--:--</strong> | Cuenta Regresiva: <span id="timer" style="color: #ef4444; font-weight:800; font-family:'Orbitron', monospace;">--:--</span>
     </div>
 
-    <div class="price-row">
+    <!-- Precios -->
+    <div class="prices-grid-3">
         <div>
-            <div class="price-block-label">Precio inicial</div>
-            <div class="price-val-init" id="base-price">...</div>
+            <div class="price-col-title">Precio Inicial</div>
+            <div class="val-initial" id="base-price">...</div>
         </div>
         <div>
-            <div class="price-block-label">Precio actual <span id="delta-badge" class="delta-badge">+$0.00</span></div>
-            <div class="price-val-curr" id="current-price">$0.00</div>
+            <div class="price-col-title">Precio Actual</div>
+            <div class="val-current" id="current-price">$0.00</div>
         </div>
-        <div class="countdown-block">
-            <div class="price-block-label">Cuenta regresiva</div>
-            <div class="countdown-val" id="timer">--:--</div>
+        <div>
+            <div class="price-col-title">Diferencia</div>
+            <div class="val-delta" id="delta-val">$0.00</div>
         </div>
     </div>
 
-    <div class="time-pills">
-        <div class="pill">Pasada ▾</div>
-        <div class="pill active" id="pill-current">--:--</div>
-        <div class="pill" id="pill-next1">--:--</div>
-        <div class="pill" id="pill-next2">--:--</div>
+    <!-- 3 Algoritmos Proyectivos (Calculadora) -->
+    <div class="calc-panel">
+        <div class="calc-panel-title">
+            <span>Precios Proyectivos (Aceleración y Velocidad)</span>
+            <span id="trend-indicator" style="color: #94a3b8;">Estable</span>
+        </div>
+        <div class="calc-targets-grid">
+            <div class="calc-item">
+                <div class="calc-label">Target (+3s)</div>
+                <div class="calc-num target-white" id="target-3s">0.00</div>
+            </div>
+            <div class="calc-item">
+                <div class="calc-label">Target (+5s)</div>
+                <div class="calc-num target-pink" id="target-5s">0.00</div>
+            </div>
+            <div class="calc-item">
+                <div class="calc-label">Target (+10s)</div>
+                <div class="calc-num target-green" id="target-10s">0.00</div>
+            </div>
+        </div>
     </div>
 
+    <!-- Gráfica 1: Segundos -->
+    <div class="chart-section-title">Gráfica en Vivo (Segundos / Ticks)</div>
     <div class="chart-box">
-        <canvas id="priceChart"></canvas>
+        <canvas id="secChart"></canvas>
     </div>
 
-    <div class="target-box">
-        <div>
-            <div class="target-title">Target Proyectado (+3s Inercia)</div>
-            <div class="target-val" id="target-val">$0.00</div>
-        </div>
-        <div style="text-align: right;">
-            <div class="target-title">Umbral Alerta</div>
-            <div style="font-weight: 700; color: #f59e0b;">±$2.00</div>
-        </div>
+    <!-- Gráfica 2: Minutos -->
+    <div class="chart-section-title">Gráfica Extendida (Por Minutos)</div>
+    <div class="chart-box">
+        <canvas id="minChart"></canvas>
     </div>
 
-    <div class="options-grid">
-        <div class="opt-card opt-up" id="btn-up">
-            <div class="opt-title">↗ Up</div>
-            <div class="opt-sub">Meta: +$2.00</div>
+    <!-- Botones UP y DOWN -->
+    <div class="options-container">
+        <div class="opt-btn up-btn" id="btn-up">
+            <div class="btn-text">UP</div>
+            <div class="btn-num">+2.00</div>
         </div>
-        <div class="opt-card opt-down" id="btn-down">
-            <div class="opt-title">↘ Down</div>
-            <div class="opt-sub">Meta: -$2.00</div>
+        <div class="opt-btn down-btn" id="btn-down">
+            <div class="btn-text">DOWN</div>
+            <div class="btn-num">-2.00</div>
         </div>
     </div>
-
-    <div class="amount-selector">
-        <button class="amt-btn">$1</button>
-        <button class="amt-btn">$5</button>
-        <button class="amt-btn">$10</button>
-        <button class="amt-btn">$50</button>
-    </div>
-
-    <button class="main-action-btn">Comprar Up</button>
 </div>
 
 <script>
     let basePrice = null;
-    const THRESHOLD = 2.0; // Umbral de $2.00 para el Oro
-    let priceHistory = [];
-    let timeHistory = [];
+    const THRESHOLD = 2.0; // Umbral de $2.00 para el oro
 
-    const ctx = document.getElementById('priceChart').getContext('2d');
-    const priceChart = new Chart(ctx, {
+    let secPrices = [];
+    let secLabels = [];
+
+    let minPrices = [];
+    let minLabels = [];
+    let lastMinuteRecorded = null;
+
+    // Gráfica de Segundos
+    const ctxSec = document.getElementById('secChart').getContext('2d');
+    const secChart = new Chart(ctxSec, {
         type: 'line',
         data: {
-            labels: timeHistory,
+            labels: secLabels,
             datasets: [{
-                data: priceHistory,
+                data: secPrices,
                 borderColor: '#f59e0b',
-                borderWidth: 2,
+                borderWidth: 1.8,
                 pointRadius: 0,
                 stepped: true,
                 tension: 0
@@ -298,26 +310,68 @@
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 9 }, maxTicksLimit: 5 } },
-                y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 9 } }, position: 'right' }
+                x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 }, maxTicksLimit: 6 } },
+                y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } }, position: 'right' }
             },
             plugins: { legend: { display: false } }
         }
     });
 
-    async function fetchBasePrice() {
+    // Gráfica de Minutos
+    const ctxMin = document.getElementById('minChart').getContext('2d');
+    const minChart = new Chart(ctxMin, {
+        type: 'line',
+        data: {
+            labels: minLabels,
+            datasets: [{
+                data: minPrices,
+                borderColor: '#7042e4',
+                borderWidth: 1.8,
+                pointRadius: 0,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 }, maxTicksLimit: 8 } },
+                y: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 8 } }, position: 'right' }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Cargar precio inicial y datos históricos de 15m/1m de PAXGUSDT
+    async function loadBinanceData() {
         try {
-            const res = await fetch('https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=15m&limit=1');
-            const data = await res.json();
-            basePrice = parseFloat(data[0][1]);
+            const res15m = await fetch('https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=15m&limit=1');
+            const data15m = await res15m.json();
+            basePrice = parseFloat(data15m[0][1]);
             document.getElementById('base-price').innerText = `$${basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
+            const res1m = await fetch('https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=1m&limit=60');
+            const data1m = await res1m.json();
+
+            minPrices = [];
+            minLabels = [];
+            data1m.forEach(candle => {
+                const timeStr = new Date(candle[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                minPrices.push(parseFloat(candle[4]));
+                minLabels.push(timeStr);
+            });
+            minChart.data.labels = minLabels;
+            minChart.data.datasets[0].data = minPrices;
+            minChart.update();
         } catch (e) {
-            console.error("Error cargando precio base de oro:", e);
+            console.error("Error al cargar datos de oro:", e);
         }
     }
-    fetchBasePrice();
-    setInterval(fetchBasePrice, 30000);
 
+    loadBinanceData();
+    setInterval(loadBinanceData, 30000);
+
+    // WebSocket Binance Oro (PAXGUSDT)
     const ws = new WebSocket("wss://stream.binance.com:9443/ws/paxgusdt@ticker");
 
     ws.onmessage = (event) => {
@@ -330,42 +384,82 @@
         const sign = delta >= 0 ? "+" : "";
 
         document.getElementById('current-price').innerText = `$${price.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        const badge = document.getElementById('delta-badge');
-        badge.innerText = `${sign}$${delta.toFixed(2)}`;
-        badge.className = `delta-badge ${delta >= 0 ? 'delta-up' : 'delta-down'}`;
+        const deltaElem = document.getElementById('delta-val');
+        deltaElem.innerText = `${sign}$${delta.toFixed(2)}`;
+        deltaElem.style.color = delta >= 0 ? "#10b981" : "#ef4444";
 
-        const cardUp = document.getElementById('btn-up');
-        const cardDown = document.getElementById('btn-down');
+        // Alertas intermitentes botones UP / DOWN
+        const btnUp = document.getElementById('btn-up');
+        const btnDown = document.getElementById('btn-down');
+
         if (delta >= THRESHOLD) {
-            cardUp.classList.add('alert-up-light');
-            cardDown.classList.remove('alert-down-light');
+            btnUp.classList.add('alert-up-active');
+            btnDown.classList.remove('alert-down-active');
         } else if (delta <= -THRESHOLD) {
-            cardDown.classList.add('alert-down-light');
-            cardUp.classList.remove('alert-up-light');
+            btnDown.classList.add('alert-down-active');
+            btnUp.classList.remove('alert-up-active');
         } else {
-            cardUp.classList.remove('alert-up-light');
-            cardDown.classList.remove('alert-down-light');
+            btnUp.classList.remove('alert-up-active');
+            btnDown.classList.remove('alert-down-active');
         }
 
-        priceHistory.push(price);
-        timeHistory.push(new Date().toLocaleTimeString());
+        const now = new Date();
+        const secTimeStr = now.toLocaleTimeString();
+        secPrices.push(price);
+        secLabels.push(secTimeStr);
 
-        if (priceHistory.length > 50) {
-            priceHistory.shift();
-            timeHistory.shift();
+        if (secPrices.length > 60) {
+            secPrices.shift();
+            secLabels.shift();
         }
+        secChart.update();
 
-        if (priceHistory.length > 10) {
+        const minTimeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if (lastMinuteRecorded !== minTimeStr) {
+            lastMinuteRecorded = minTimeStr;
+            minPrices.push(price);
+            minLabels.push(minTimeStr);
+            if (minPrices.length > 60) {
+                minPrices.shift();
+                minLabels.shift();
+            }
+        } else if (minPrices.length > 0) {
+            minPrices[minPrices.length - 1] = price;
+        }
+        minChart.update();
+
+        // Algoritmos Proyectivos (+3s, +5s, +10s)
+        if (secPrices.length > 15) {
             const pNow = price;
-            const pPast = priceHistory[priceHistory.length - 6];
-            const velocity = (pNow - pPast) / 5;
-            const target3s = pNow + (velocity * 3);
-            document.getElementById('target-val').innerText = `$${target3s.toFixed(2)}`;
-        }
+            const p5s = secPrices[secPrices.length - 6];
+            const p10s = secPrices[secPrices.length - 15];
 
-        priceChart.update();
+            const vel3 = (pNow - p5s) / 5;
+            const vel5 = (pNow - p10s) / 10;
+
+            const target3s = pNow + (vel3 * 3);
+            const target5s = pNow + (vel5 * 5);
+            const target10s = pNow + (vel5 * 10);
+
+            document.getElementById('target-3s').innerText = target3s.toFixed(2);
+            document.getElementById('target-5s').innerText = target5s.toFixed(2);
+            document.getElementById('target-10s').innerText = target10s.toFixed(2);
+
+            const trendIndicator = document.getElementById('trend-indicator');
+            if (vel3 > 0.05) {
+                trendIndicator.innerText = "Impulso Alcista 🚀";
+                trendIndicator.style.color = "#10b981";
+            } else if (vel3 < -0.05) {
+                trendIndicator.innerText = "Impulso Bajista 🔻";
+                trendIndicator.style.color = "#ef4444";
+            } else {
+                trendIndicator.innerText = "Inercia Estable ⚖️";
+                trendIndicator.style.color = "#94a3b8";
+            }
+        }
     };
 
+    // Temporizador de 15 minutos
     function updateTimer() {
         const now = new Date();
         const mins = now.getMinutes();
@@ -380,10 +474,6 @@
         document.getElementById('timer').innerText = 
             `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         document.getElementById('vencimiento-str').innerText = targetDate.toLocaleTimeString();
-
-        document.getElementById('pill-current').innerText = `${now.getHours()}:${String(Math.floor(mins/15)*15).padStart(2,'0')}`;
-        document.getElementById('pill-next1').innerText = `${now.getHours()}:${String((Math.floor(mins/15)*15 + 15)%60).padStart(2,'0')}`;
-        document.getElementById('pill-next2').innerText = `${now.getHours()}:${String((Math.floor(mins/15)*15 + 30)%60).padStart(2,'0')}`;
     }
     setInterval(updateTimer, 1000);
     updateTimer();
