@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorldMarketXTM - Predict Panel Multipantalla Sincronizado</title>
+    <title>WorldMarketXTM - Predict Panel Multipantalla</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background-color: #f0f2f5; color: #1e2329; margin: 0; padding: 15px; }
         
-        /* Título compacto y en NEGRITA extrema */
         .header-title-main { text-align: center; margin-bottom: 12px; }
         .header-title-main h1 { margin: 0; font-size: 1.3em; color: #0f172a; font-weight: 900; letter-spacing: -0.3px; }
         .date-display { font-size: 0.85em; color: #475467; font-weight: 700; margin-top: 2px; }
@@ -42,7 +41,6 @@
         .calc-label { font-size: 0.65em; color: #94a3b8; margin-bottom: 2px; font-weight: 600; }
         .calc-num { font-size: 1.05em; font-weight: 800; }
         
-        /* Colores de algoritmos proyectivos */
         .target-yellow { color: #facc15; } /* +3s Amarillo */
         .target-blue   { color: #38bdf8; } /* +5s Azul Claro */
         .target-orange { color: #fb923c; } /* +10s Naranja */
@@ -177,7 +175,7 @@
     const ASSETS = {
         btc:     { symbol: 'btcusdt',     interval: '1h',  threshold: 375.0, color: '#f7931a' },
         xau:     { symbol: 'paxgusdt',    interval: '15m', threshold: 2.0,   color: '#f59e0b' },
-        skhynix: { symbol: 'skhynixusdt', interval: '15m', threshold: 3.0,   color: '#e11d48' } // Contrato Futuros de SKHYNIX en Binance Predict
+        skhynix: { symbol: 'skhynixusdt', interval: '15m', threshold: 3.0,   color: '#e11d48' }
     };
 
     const state = {
@@ -215,13 +213,12 @@
         const cfg = ASSETS[key];
         const st = state[key];
         try {
-            // Consulta directa a la API de Futuros de Binance (Mark Price oficial de Predict)
-            const resBase = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
+            const resBase = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
             const dataBase = await resBase.json();
             st.basePrice = parseFloat(dataBase[0][1]);
             document.getElementById(`${key}-base`).innerText = `$${st.basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-            const res1m = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${cfg.symbol.toUpperCase()}&interval=1m&limit=60`);
+            const res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=1m&limit=60`);
             const data1m = await res1m.json();
 
             st.minP = []; st.minL = [];
@@ -246,8 +243,7 @@
             try { st.ws.close(); } catch(e){}
         }
 
-        // WebSocket directo al Mark Price Stream de Binance Predict (Futuros en tiempo real)
-        st.ws = new WebSocket(`wss://fstream.binance.com/ws/${cfg.symbol}@markPrice@1s`);
+        st.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.symbol}@ticker`);
 
         st.ws.onopen = () => {
             netElem.innerText = "🟢 En Vivo";
@@ -267,7 +263,7 @@
 
         st.ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const price = parseFloat(data.p);
+            const price = parseFloat(data.c);
             if (!st.basePrice || isNaN(price)) return;
 
             const delta = price - st.basePrice;
@@ -285,7 +281,7 @@
             } else if (delta <= -cfg.threshold) {
                 btnDown.classList.add('alert-down-active'); btnUp.classList.remove('alert-up-active');
             } else {
-                btnUp.classList.remove('alert-up-active'); btnDown.classList.remove('alert-down-active');
+                btnUp.classList.remove('alert-up-active'); btnDown.classList.remove('alert-up-active');
             }
 
             const now = new Date();
