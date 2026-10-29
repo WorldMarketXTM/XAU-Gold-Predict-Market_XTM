@@ -9,7 +9,6 @@
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background-color: #f0f2f5; color: #1e2329; margin: 0; padding: 15px; }
         
-        /* Título y Fecha centrados en un solo renglón con diagonal (/) */
         .header-top-center { text-align: center; max-width: 1800px; margin: 0 auto 15px auto; padding: 0 10px; }
         .header-top-center h1 { margin: 0; font-size: 1.25em; color: #0f172a; font-weight: 900; letter-spacing: -0.3px; }
 
@@ -135,36 +134,36 @@
         </div>
     </div>
 
-    <!-- 3. SK HYNIX (SKHYNIX) -->
+    <!-- 3. SANDISK (SNDK) -->
     <div class="app-card">
         <div class="card-top-header">
-            <div class="market-title"><span class="asset-icon" style="background:#e11d48;">SK</span> SKHYNIX Up or Down 15m</div>
-            <span id="skhynix-net" class="net-status">Conectando...</span>
+            <div class="market-title"><span class="asset-icon" style="background:#7042e4;">SD</span> SNDK Up or Down 15m</div>
+            <span id="sndk-net" class="net-status">Conectando...</span>
         </div>
         <div class="vencimiento-text">
-            <span>Vence: <strong id="skhynix-venc">--:--:--</strong></span>
-            <span>Regresiva: <strong id="skhynix-timer" class="timer-text">--:--</strong></span>
+            <span>Vence: <strong id="sndk-venc">--:--:--</strong></span>
+            <span>Regresiva: <strong id="sndk-timer" class="timer-text">--:--</strong></span>
         </div>
         <div class="prices-grid-3">
-            <div><div class="price-col-title">Inicial</div><div class="val-initial" id="skhynix-base">...</div></div>
-            <div><div class="price-col-title">Actual</div><div class="val-current" id="skhynix-curr">$0.00</div></div>
-            <div><div class="price-col-title">Diferencia</div><div class="val-delta" id="skhynix-delta">$0.00</div></div>
+            <div><div class="price-col-title">Inicial</div><div class="val-initial" id="sndk-base">...</div></div>
+            <div><div class="price-col-title">Actual</div><div class="val-current" id="sndk-curr">$0.00</div></div>
+            <div><div class="price-col-title">Diferencia</div><div class="val-delta" id="sndk-delta">$0.00</div></div>
         </div>
         <div class="calc-panel">
-            <div class="calc-panel-title"><span>Target Proyectivo</span><span id="skhynix-trend" style="color:#94a3b8;">Estable</span></div>
+            <div class="calc-panel-title"><span>Target Proyectivo</span><span id="sndk-trend" style="color:#94a3b8;">Estable</span></div>
             <div class="calc-targets-grid">
-                <div class="calc-item"><div class="calc-label">+3s</div><div class="calc-num target-yellow" id="skhynix-t3">0.00</div></div>
-                <div class="calc-item"><div class="calc-label">+5s</div><div class="calc-num target-blue" id="skhynix-t5">0.00</div></div>
-                <div class="calc-item"><div class="calc-label">+10s</div><div class="calc-num target-orange" id="skhynix-t10">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+3s</div><div class="calc-num target-yellow" id="sndk-t3">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+5s</div><div class="calc-num target-blue" id="sndk-t5">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+10s</div><div class="calc-num target-orange" id="sndk-t10">0.00</div></div>
             </div>
         </div>
         <div class="chart-section-title">En Vivo (Segundos)</div>
-        <div class="chart-box"><canvas id="skhynixSecChart"></canvas></div>
+        <div class="chart-box"><canvas id="sndkSecChart"></canvas></div>
         <div class="chart-section-title">Extendida (Minutos)</div>
-        <div class="chart-box"><canvas id="skhynixMinChart"></canvas></div>
+        <div class="chart-box"><canvas id="sndkMinChart"></canvas></div>
         <div class="options-container">
-            <div class="opt-btn up-btn" id="skhynix-btn-up"><span class="btn-text">UP</span><span class="btn-num">+3.00</span></div>
-            <div class="opt-btn down-btn" id="skhynix-btn-down"><span class="btn-text">DOWN</span><span class="btn-num">-3.00</span></div>
+            <div class="opt-btn up-btn" id="sndk-btn-up"><span class="btn-text">UP</span><span class="btn-num">+3.00</span></div>
+            <div class="opt-btn down-btn" id="sndk-btn-down"><span class="btn-text">DOWN</span><span class="btn-num">-3.00</span></div>
         </div>
     </div>
 
@@ -172,15 +171,15 @@
 
 <script>
     const ASSETS = {
-        btc:     { symbol: 'btcusdt',     interval: '1h',  threshold: 375.0, color: '#f7931a' },
-        xau:     { symbol: 'paxgusdt',    interval: '15m', threshold: 2.0,   color: '#f59e0b', fallback: 'btcusdt' },
-        skhynix: { symbol: 'skhynixusdt', interval: '15m', threshold: 3.0,   color: '#e11d48', fallback: 'ethusdt' }
+        btc:  { symbol: 'btcusdt',  interval: '1h',  threshold: 375.0, color: '#f7931a' },
+        xau:  { symbol: 'paxgusdt', interval: '15m', threshold: 2.0,   color: '#f59e0b', fallback: 'btcusdt' },
+        sndk: { symbol: 'sndkusdt', interval: '15m', threshold: 3.0,   color: '#7042e4', fallback: 'ethusdt' }
     };
 
     const state = {
-        btc:     { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null },
-        xau:     { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null },
-        skhynix: { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null }
+        btc:  { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null },
+        xau:  { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null },
+        sndk: { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null }
     };
 
     function createChart(ctxId, color, isStepped = false) {
@@ -200,12 +199,13 @@
     }
 
     const charts = {
+        btcMeter:   null,
         btcSec:     createChart('btcSecChart', ASSETS.btc.color, true),
         btcMin:     createChart('btcMinChart', ASSETS.btc.color),
         xauSec:     createChart('xauSecChart', ASSETS.xau.color, true),
         xauMin:     createChart('xauMinChart', ASSETS.xau.color),
-        skhynixSec: createChart('skhynixSecChart', ASSETS.skhynix.color, true),
-        skhynixMin: createChart('skhynixMinChart', ASSETS.skhynix.color)
+        sndkSec:    createChart('sndkSecChart', ASSETS.sndk.color, true),
+        sndkMin:    createChart('sndkMinChart', ASSETS.sndk.color)
     };
 
     async function fetchBasePrice(key) {
@@ -328,13 +328,12 @@
         const dateStr = now.toLocaleDateString('es-ES', options);
         const formattedDate = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
         
-        // Título y Fecha centrados con una diagonal (/)
         document.getElementById('main-header-title').innerText = `XTM-Predict - World_Market / ${formattedDate}`;
 
         const mins = now.getMinutes();
         const secs = now.getSeconds();
 
-        ['btc', 'xau', 'skhynix'].forEach(key => {
+        ['btc', 'xau', 'sndk'].forEach(key => {
             const intervalMins = ASSETS[key].interval === '1h' ? 60 : 15;
             const nextMins = Math.ceil((mins + (secs > 0 ? 1 : 0)) / intervalMins) * intervalMins;
             const targetDate = new Date(now);
@@ -351,7 +350,7 @@
         });
     }
 
-    ['btc', 'xau', 'skhynix'].forEach(key => {
+    ['btc', 'xau', 'sndk'].forEach(key => {
         fetchBasePrice(key);
         connectWebSocket(key);
         setInterval(() => fetchBasePrice(key), 15000);
