@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorldMarketXTM - Predict Panel Multipantalla</title>
+    <title>WorldMarketXTM - Predict Panel Multipantalla Sincronizado</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background-color: #f0f2f5; color: #1e2329; margin: 0; padding: 15px; }
         
-        /* Título reducido, compacto y en NEGRITA */
+        /* Título compacto y en NEGRITA extrema */
         .header-title-main { text-align: center; margin-bottom: 12px; }
         .header-title-main h1 { margin: 0; font-size: 1.3em; color: #0f172a; font-weight: 900; letter-spacing: -0.3px; }
         .date-display { font-size: 0.85em; color: #475467; font-weight: 700; margin-top: 2px; }
@@ -26,8 +26,6 @@
         .net-offline { background: #fef2f2; color: #b91c1c; }
 
         .vencimiento-text { font-size: 0.8em; color: #667085; margin-bottom: 10px; display: flex; justify-content: space-between; }
-        
-        /* Regresiva con letra NORMAL (sans-serif) y en negrita */
         .timer-text { color: #ef4444; font-weight: 800; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.95em; }
 
         .prices-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; background: #f8fafc; padding: 8px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
@@ -44,14 +42,12 @@
         .calc-label { font-size: 0.65em; color: #94a3b8; margin-bottom: 2px; font-weight: 600; }
         .calc-num { font-size: 1.05em; font-weight: 800; }
         
-        /* Colores de algoritmos proyectivos solicitados */
+        /* Colores de algoritmos proyectivos */
         .target-yellow { color: #facc15; } /* +3s Amarillo */
         .target-blue   { color: #38bdf8; } /* +5s Azul Claro */
         .target-orange { color: #fb923c; } /* +10s Naranja */
         
         .chart-section-title { font-size: 0.68em; color: #64748b; margin-bottom: 4px; text-transform: uppercase; font-weight: 700; }
-        
-        /* Gráficas más largas verticalmente (185px) */
         .chart-box { position: relative; height: 185px; width: 100%; margin-bottom: 10px; background: #ffffff; border-radius: 10px; padding: 4px; border: 1px solid #e2e8f0; }
         
         .options-container { display: flex; gap: 8px; margin-top: auto; }
@@ -142,36 +138,36 @@
         </div>
     </div>
 
-    <!-- 3. SANDISK (SNDK) -->
+    <!-- 3. SK HYNIX (SKHYNIX) -->
     <div class="app-card">
         <div class="card-top-header">
-            <div class="market-title"><span class="asset-icon" style="background:#7042e4;">SD</span> SNDK Up or Down 15m</div>
-            <span id="sndk-net" class="net-status">Conectando...</span>
+            <div class="market-title"><span class="asset-icon" style="background:#e11d48;">SK</span> SKHYNIX Up or Down 15m</div>
+            <span id="skhynix-net" class="net-status">Conectando...</span>
         </div>
         <div class="vencimiento-text">
-            <span>Vence: <strong id="sndk-venc">--:--:--</strong></span>
-            <span>Regresiva: <strong id="sndk-timer" class="timer-text">--:--</strong></span>
+            <span>Vence: <strong id="skhynix-venc">--:--:--</strong></span>
+            <span>Regresiva: <strong id="skhynix-timer" class="timer-text">--:--</strong></span>
         </div>
         <div class="prices-grid-3">
-            <div><div class="price-col-title">Inicial</div><div class="val-initial" id="sndk-base">...</div></div>
-            <div><div class="price-col-title">Actual</div><div class="val-current" id="sndk-curr">$0.00</div></div>
-            <div><div class="price-col-title">Diferencia</div><div class="val-delta" id="sndk-delta">$0.00</div></div>
+            <div><div class="price-col-title">Inicial</div><div class="val-initial" id="skhynix-base">...</div></div>
+            <div><div class="price-col-title">Actual</div><div class="val-current" id="skhynix-curr">$0.00</div></div>
+            <div><div class="price-col-title">Diferencia</div><div class="val-delta" id="skhynix-delta">$0.00</div></div>
         </div>
         <div class="calc-panel">
-            <div class="calc-panel-title"><span>Target Proyectivo</span><span id="sndk-trend" style="color:#94a3b8;">Estable</span></div>
+            <div class="calc-panel-title"><span>Target Proyectivo</span><span id="skhynix-trend" style="color:#94a3b8;">Estable</span></div>
             <div class="calc-targets-grid">
-                <div class="calc-item"><div class="calc-label">+3s</div><div class="calc-num target-yellow" id="sndk-t3">0.00</div></div>
-                <div class="calc-item"><div class="calc-label">+5s</div><div class="calc-num target-blue" id="sndk-t5">0.00</div></div>
-                <div class="calc-item"><div class="calc-label">+10s</div><div class="calc-num target-orange" id="sndk-t10">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+3s</div><div class="calc-num target-yellow" id="skhynix-t3">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+5s</div><div class="calc-num target-blue" id="skhynix-t5">0.00</div></div>
+                <div class="calc-item"><div class="calc-label">+10s</div><div class="calc-num target-orange" id="skhynix-t10">0.00</div></div>
             </div>
         </div>
         <div class="chart-section-title">En Vivo (Segundos)</div>
-        <div class="chart-box"><canvas id="sndkSecChart"></canvas></div>
+        <div class="chart-box"><canvas id="skhynixSecChart"></canvas></div>
         <div class="chart-section-title">Extendida (Minutos)</div>
-        <div class="chart-box"><canvas id="sndkMinChart"></canvas></div>
+        <div class="chart-box"><canvas id="skhynixMinChart"></canvas></div>
         <div class="options-container">
-            <div class="opt-btn up-btn" id="sndk-btn-up"><div class="btn-text">UP</div><div class="btn-num">+3.00</div></div>
-            <div class="opt-btn down-btn" id="sndk-btn-down"><div class="btn-text">DOWN</div><div class="btn-num">-3.00</div></div>
+            <div class="opt-btn up-btn" id="skhynix-btn-up"><div class="btn-text">UP</div><div class="btn-num">+3.00</div></div>
+            <div class="opt-btn down-btn" id="skhynix-btn-down"><div class="btn-text">DOWN</div><div class="btn-num">-3.00</div></div>
         </div>
     </div>
 
@@ -179,15 +175,15 @@
 
 <script>
     const ASSETS = {
-        btc:  { symbol: 'btcusdt',  interval: '1h',  threshold: 375.0, color: '#f7931a' },
-        xau:  { symbol: 'paxgusdt', interval: '15m', threshold: 2.0,   color: '#f59e0b' },
-        sndk: { symbol: 'ethusdt',  interval: '15m', threshold: 3.0,   color: '#7042e4' }
+        btc:     { symbol: 'btcusdt',     interval: '1h',  threshold: 375.0, color: '#f7931a' },
+        xau:     { symbol: 'paxgusdt',    interval: '15m', threshold: 2.0,   color: '#f59e0b' },
+        skhynix: { symbol: 'skhynixusdt', interval: '15m', threshold: 3.0,   color: '#e11d48' } // Contrato Futuros de SKHYNIX en Binance Predict
     };
 
     const state = {
-        btc:  { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null },
-        xau:  { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null },
-        sndk: { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null }
+        btc:     { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null },
+        xau:     { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null },
+        skhynix: { basePrice: null, secP: [], secL: [], minP: [], minL: [], lastMin: null, ws: null }
     };
 
     function createChart(ctxId, color, isStepped = false) {
@@ -207,24 +203,25 @@
     }
 
     const charts = {
-        btcSec:  createChart('btcSecChart', ASSETS.btc.color, true),
-        btcMin:  createChart('btcMinChart', '#7042e4'),
-        xauSec:  createChart('xauSecChart', ASSETS.xau.color, true),
-        xauMin:  createChart('xauMinChart', '#7042e4'),
-        sndkSec: createChart('sndkSecChart', ASSETS.sndk.color, true),
-        sndkMin: createChart('sndkMinChart', '#f7931a')
+        btcSec:     createChart('btcSecChart', ASSETS.btc.color, true),
+        btcMin:     createChart('btcMinChart', '#7042e4'),
+        xauSec:     createChart('xauSecChart', ASSETS.xau.color, true),
+        xauMin:     createChart('xauMinChart', '#7042e4'),
+        skhynixSec: createChart('skhynixSecChart', ASSETS.skhynix.color, true),
+        skhynixMin: createChart('skhynixMinChart', '#7042e4')
     };
 
     async function fetchBasePrice(key) {
         const cfg = ASSETS[key];
         const st = state[key];
         try {
-            const resBase = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
+            // Consulta directa a la API de Futuros de Binance (Mark Price oficial de Predict)
+            const resBase = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
             const dataBase = await resBase.json();
             st.basePrice = parseFloat(dataBase[0][1]);
             document.getElementById(`${key}-base`).innerText = `$${st.basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-            const res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=1m&limit=60`);
+            const res1m = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${cfg.symbol.toUpperCase()}&interval=1m&limit=60`);
             const data1m = await res1m.json();
 
             st.minP = []; st.minL = [];
@@ -249,7 +246,8 @@
             try { st.ws.close(); } catch(e){}
         }
 
-        st.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.symbol}@ticker`);
+        // WebSocket directo al Mark Price Stream de Binance Predict (Futuros en tiempo real)
+        st.ws = new WebSocket(`wss://fstream.binance.com/ws/${cfg.symbol}@markPrice@1s`);
 
         st.ws.onopen = () => {
             netElem.innerText = "🟢 En Vivo";
@@ -269,7 +267,7 @@
 
         st.ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const price = parseFloat(data.c);
+            const price = parseFloat(data.p);
             if (!st.basePrice || isNaN(price)) return;
 
             const delta = price - st.basePrice;
@@ -335,7 +333,7 @@
 
         const mins = now.getMinutes();
 
-        ['btc', 'xau', 'sndk'].forEach(key => {
+        ['btc', 'xau', 'skhynix'].forEach(key => {
             const intervalMins = ASSETS[key].interval === '1h' ? 60 : 15;
             const nextTime = Math.ceil((mins + 1) / intervalMins) * intervalMins;
             const targetDate = new Date(now);
@@ -350,7 +348,7 @@
         });
     }
 
-    ['btc', 'xau', 'sndk'].forEach(key => {
+    ['btc', 'xau', 'skhynix'].forEach(key => {
         fetchBasePrice(key);
         connectWebSocket(key);
         setInterval(() => fetchBasePrice(key), 15000);
