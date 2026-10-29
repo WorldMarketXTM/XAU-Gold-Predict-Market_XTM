@@ -173,7 +173,7 @@
     const ASSETS = {
         btc:  { symbol: 'btcusdt',  interval: 3600, threshold: 375.0, color: '#f7931a', restSymbol: 'BTCUSDT' },
         xau:  { symbol: 'paxgusdt', interval: 900,  threshold: 2.0,   color: '#f59e0b', restSymbol: 'PAXGUSDT' },
-        sndk: { symbol: 'ethusdt',  interval: 900,  threshold: 3.0,   color: '#e11d48', restSymbol: 'ETHUSDT' }
+        sndk: { symbol: 'sndkusdt', interval: 900,  threshold: 3.0,   color: '#e11d48', restSymbol: 'SNDKUSDT' }
     };
 
     const state = {
@@ -212,12 +212,21 @@
         const st = state[key];
         try {
             const intStr = cfg.interval === 3600 ? '1h' : '15m';
-            const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.restSymbol}&interval=${intStr}&limit=1`);
+            let res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.restSymbol}&interval=${intStr}&limit=1`);
+            
+            // Respaldo inteligente si el tokenizado tuviese variante en Futuros o Spot
+            if (!res.ok && key === 'sndk') {
+                res = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${cfg.restSymbol}&interval=${intStr}&limit=1`);
+            }
+            
             const dataBase = await res.json();
             st.basePrice = parseFloat(dataBase[0][1]);
             document.getElementById(`${key}-base`).innerText = `$${st.basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-            const res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.restSymbol}&interval=1m&limit=60`);
+            let res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.restSymbol}&interval=1m&limit=60`);
+            if (!res1m.ok && key === 'sndk') {
+                res1m = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${cfg.restSymbol}&interval=1m&limit=60`);
+            }
             const data1m = await res1m.json();
 
             st.minP = []; st.minL = [];
@@ -309,8 +318,8 @@
                 document.getElementById(`${key}-t10`).innerText = (pNow + vel * 10).toFixed(2);
 
                 const trendElem = document.getElementById(`${key}-trend`);
-                if (vel > 0.001) { trendElem.innerText = "Alcista 🚀"; trendElem.style.color = "#10b981"; }
-                else if (vel < -0.001) { trendElem.innerText = "Bajista 🔻"; trendElem.style.color = "#ef4444"; }
+                if (vel > 0.0001) { trendElem.innerText = "Alcista 🚀"; trendElem.style.color = "#10b981"; }
+                else if (vel < -0.0001) { trendElem.innerText = "Bajista 🔻"; trendElem.style.color = "#ef4444"; }
                 else { trendElem.innerText = "Estable ⚖️"; trendElem.style.color = "#94a3b8"; }
             }
         };
