@@ -171,9 +171,9 @@
 
 <script>
     const ASSETS = {
-        btc:  { symbol: 'btcusdt',  interval: '1h',  threshold: 375.0, color: '#f7931a', restSymbol: 'BTCUSDT' },
-        xau:  { symbol: 'paxgusdt', interval: '15m', threshold: 2.0,   color: '#f59e0b', restSymbol: 'PAXGUSDT' },
-        sndk: { symbol: 'ethusdt',  interval: '15m', threshold: 3.0,   color: '#e11d48', restSymbol: 'ETHUSDT' }
+        btc:  { symbol: 'btcusdt',  interval: 3600, threshold: 375.0, color: '#f7931a', restSymbol: 'BTCUSDT' },
+        xau:  { symbol: 'paxgusdt', interval: 900,  threshold: 2.0,   color: '#f59e0b', restSymbol: 'PAXGUSDT' },
+        sndk: { symbol: 'ethusdt',  interval: 900,  threshold: 3.0,   color: '#e11d48', restSymbol: 'ETHUSDT' }
     };
 
     const state = {
@@ -211,7 +211,8 @@
         const cfg = ASSETS[key];
         const st = state[key];
         try {
-            const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.restSymbol}&interval=${cfg.interval}&limit=1`);
+            const intStr = cfg.interval === 3600 ? '1h' : '15m';
+            const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.restSymbol}&interval=${intStr}&limit=1`);
             const dataBase = await res.json();
             st.basePrice = parseFloat(dataBase[0][1]);
             document.getElementById(`${key}-base`).innerText = `$${st.basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
@@ -298,19 +299,18 @@
             }
             charts[`${key}Min`].update();
 
-            if (st.secP.length > 10) {
+            if (st.secP.length > 3) {
                 const pNow = price;
-                const p3s = st.secP[st.secP.length - 4] || pNow;
-                const p10s = st.secP[st.secP.length - 10] || pNow;
-                const blendedVel = (((pNow - p3s)/3) * 0.6) + (((pNow - p10s)/10) * 0.4);
+                const pPrev = st.secP[st.secP.length - 3] || pNow;
+                const vel = (pNow - pPrev) / 3;
 
-                document.getElementById(`${key}-t3`).innerText = (pNow + blendedVel * 3).toFixed(2);
-                document.getElementById(`${key}-t5`).innerText = (pNow + blendedVel * 5).toFixed(2);
-                document.getElementById(`${key}-t10`).innerText = (pNow + blendedVel * 10).toFixed(2);
+                document.getElementById(`${key}-t3`).innerText = (pNow + vel * 3).toFixed(2);
+                document.getElementById(`${key}-t5`).innerText = (pNow + vel * 5).toFixed(2);
+                document.getElementById(`${key}-t10`).innerText = (pNow + vel * 10).toFixed(2);
 
                 const trendElem = document.getElementById(`${key}-trend`);
-                if (blendedVel > 0.01) { trendElem.innerText = "Alcista 🚀"; trendElem.style.color = "#10b981"; }
-                else if (blendedVel < -0.01) { trendElem.innerText = "Bajista 🔻"; trendElem.style.color = "#ef4444"; }
+                if (vel > 0.001) { trendElem.innerText = "Alcista 🚀"; trendElem.style.color = "#10b981"; }
+                else if (vel < -0.001) { trendElem.innerText = "Bajista 🔻"; trendElem.style.color = "#ef4444"; }
                 else { trendElem.innerText = "Estable ⚖️"; trendElem.style.color = "#94a3b8"; }
             }
         };
@@ -318,6 +318,8 @@
 
     function updateTimersAndDate() {
         const now = new Date();
+        const epochSecs = Math.floor(now.getTime() / 1000);
+
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const dateStr = now.toLocaleDateString('es-ES', options);
         const formattedDate = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
@@ -325,21 +327,15 @@
         document.getElementById('main-header-title').innerText = `XTM-Predict - World_Market / ${formattedDate}`;
 
         ['btc', 'xau', 'sndk'].forEach(key => {
-            const intervalMins = ASSETS[key].interval === '1h' ? 60 : 15;
-            const currentMins = now.getMinutes();
-            const currentSecs = now.getSeconds();
-            const currentMs = now.getMilliseconds();
+            const interval = ASSETS[key].interval;
+            const currentBlockStart = Math.floor(epochSecs / interval) * interval;
+            const nextBlockStart = currentBlockStart + interval;
+            const remSecs = Math.max(0, nextBlockStart - epochSecs);
 
-            const nextMins = Math.ceil((currentMins + (currentSecs > 0 || currentMs > 0 ? 1 : 0)) / intervalMins) * intervalMins;
-            const targetDate = new Date(now);
-            targetDate.setMinutes(nextMins, 0, 0);
+            const m = Math.floor(remSecs / 60);
+            const s = remSecs % 60;
 
-            let diffMs = targetDate.getTime() - now.getTime();
-            if (diffMs < 0) diffMs = 0;
-
-            const totalSecs = Math.floor(diffMs / 1000);
-            const m = Math.floor(totalSecs / 60);
-            const s = totalSecs % 60;
+            const targetDate = new Date(nextBlockStart * 1000);
 
             document.getElementById(`${key}-timer`).innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
             document.getElementById(`${key}-venc`).innerText = targetDate.toLocaleTimeString();
