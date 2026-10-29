@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorldMarketXTM - Dashboard Predict Sincronizado</title>
+    <title>WorldMarketXTM - Predict Sincronizado 100%</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
@@ -32,7 +32,6 @@
         .prices-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; background: #f8fafc; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; }
         .price-col-title { font-size: 0.68em; color: #64748b; margin-bottom: 2px; text-transform: uppercase; font-weight: 600; }
         
-        /* Estilos de colores ajustados */
         .val-initial { color: #2563eb; font-size: 1em; font-weight: 800; } /* Azul */
         .val-current { color: #16a34a; font-size: 1.05em; font-weight: 800; } /* Verde */
         .val-delta   { color: #dc2626; font-size: 1em; font-weight: 800; } /* Rojo */
@@ -177,7 +176,7 @@
     const ASSETS = {
         btc:  { symbol: 'btcusdt',  interval: '1h',  threshold: 375.0, color: '#f7931a' },
         xau:  { symbol: 'paxgusdt', interval: '15m', threshold: 2.0,   color: '#f59e0b' },
-        sndk: { symbol: 'ethusdt',  interval: '15m', threshold: 3.0,   color: '#7042e4' } // Ticker de Spot con conectividad 100% garantizada en navegadores
+        sndk: { symbol: 'sndkusdt', interval: '15m', threshold: 3.0,   color: '#7042e4' }
     };
 
     const state = {
@@ -211,16 +210,17 @@
         sndkMin: createChart('sndkMinChart', '#f7931a')
     };
 
+    // Obtener el precio inicial exacto de la vela de apertura del bloque de Binance Futures
     async function fetchBasePrice(key) {
         const cfg = ASSETS[key];
         const st = state[key];
         try {
-            const resBase = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
+            const resBase = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
             const dataBase = await resBase.json();
-            st.basePrice = parseFloat(dataBase[0][1]);
+            st.basePrice = parseFloat(dataBase[0][1]); // Precio de Apertura exacto del bloque Predict
             document.getElementById(`${key}-base`).innerText = `$${st.basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-            const res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=1m&limit=60`);
+            const res1m = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${cfg.symbol.toUpperCase()}&interval=1m&limit=60`);
             const data1m = await res1m.json();
 
             st.minP = []; st.minL = [];
@@ -245,8 +245,8 @@
             try { st.ws.close(); } catch(e){}
         }
 
-        // Endpoint WebSocket Spot NATIVO de Binance
-        st.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.symbol}@ticker`);
+        // Conexión directa al MarkPrice Stream de Futuros de Binance (El motor real de Predict)
+        st.ws = new WebSocket(`wss://fstream.binance.com/ws/${cfg.symbol}@markPrice@1s`);
 
         st.ws.onopen = () => {
             netElem.innerText = "🟢 En Vivo";
@@ -266,8 +266,8 @@
 
         st.ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const price = parseFloat(data.c);
-            if (!st.basePrice) return;
+            const price = parseFloat(data.p); // Usa el Mark Price en tiempo real ('p')
+            if (!st.basePrice || isNaN(price)) return;
 
             const delta = price - st.basePrice;
             const sign = delta >= 0 ? "+" : "";
