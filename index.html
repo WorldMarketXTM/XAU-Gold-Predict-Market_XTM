@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorldMarketXTM - Predict Panel Multipantalla</title>
+    <title>WorldMarketXTM - Predict Panel Definitivo</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background-color: #f0f2f5; color: #1e2329; margin: 0; padding: 15px; }
         
-        .header-title-main { text-align: center; margin-bottom: 12px; }
-        .header-title-main h1 { margin: 0; font-size: 1.3em; color: #0f172a; font-weight: 900; letter-spacing: -0.3px; }
-        .date-display { font-size: 0.85em; color: #475467; font-weight: 700; margin-top: 2px; }
+        /* 1. Título y Fecha en un solo renglón, uno en cada esquina */
+        .header-top-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1800px; margin: 0 auto 15px auto; padding: 0 10px; }
+        .header-top-bar h1 { margin: 0; font-size: 1.2em; color: #0f172a; font-weight: 900; letter-spacing: -0.3px; }
+        .date-display { font-size: 0.85em; color: #475467; font-weight: 700; }
 
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 15px; max-width: 1800px; margin: 0 auto; }
         .app-card { background-color: #ffffff; padding: 16px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 1px solid #eaeaea; display: flex; flex-direction: column; }
@@ -25,7 +26,7 @@
         .net-offline { background: #fef2f2; color: #b91c1c; }
 
         .vencimiento-text { font-size: 0.8em; color: #667085; margin-bottom: 10px; display: flex; justify-content: space-between; }
-        .timer-text { color: #ef4444; font-weight: 800; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.95em; }
+        .timer-text { color: #ef4444; font-weight: 800; font-size: 0.95em; }
 
         .prices-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; background: #f8fafc; padding: 8px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
         .price-col-title { font-size: 0.65em; color: #64748b; margin-bottom: 2px; text-transform: uppercase; font-weight: 700; }
@@ -46,12 +47,13 @@
         .target-orange { color: #fb923c; } /* +10s Naranja */
         
         .chart-section-title { font-size: 0.68em; color: #64748b; margin-bottom: 4px; text-transform: uppercase; font-weight: 700; }
-        .chart-box { position: relative; height: 185px; width: 100%; margin-bottom: 10px; background: #ffffff; border-radius: 10px; padding: 4px; border: 1px solid #e2e8f0; }
+        .chart-box { position: relative; height: 175px; width: 100%; margin-bottom: 10px; background: #ffffff; border-radius: 10px; padding: 4px; border: 1px solid #e2e8f0; }
         
+        /* 2. Botones UP / DOWN más delgados en un solo renglón */
         .options-container { display: flex; gap: 8px; margin-top: auto; }
-        .opt-btn { flex: 1; background-color: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; text-align: center; }
-        .opt-btn .btn-text { font-size: 0.9em; font-weight: 700; }
-        .opt-btn .btn-num { font-size: 1.1em; font-weight: 800; margin-top: 1px; }
+        .opt-btn { flex: 1; background-color: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; }
+        .opt-btn .btn-text { font-size: 0.85em; font-weight: 800; }
+        .opt-btn .btn-num { font-size: 0.95em; font-weight: 800; }
         .up-btn .btn-text, .up-btn .btn-num { color: #10b981; }
         .down-btn .btn-text, .down-btn .btn-num { color: #ef4444; }
 
@@ -63,7 +65,7 @@
 </head>
 <body>
 
-<div class="header-title-main">
+<div class="header-top-bar">
     <h1>predict - Panel Multipantalla</h1>
     <div class="date-display" id="date-display">Cargando fecha...</div>
 </div>
@@ -98,8 +100,8 @@
         <div class="chart-section-title">Extendida (Minutos)</div>
         <div class="chart-box"><canvas id="btcMinChart"></canvas></div>
         <div class="options-container">
-            <div class="opt-btn up-btn" id="btc-btn-up"><div class="btn-text">UP</div><div class="btn-num">+375.00</div></div>
-            <div class="opt-btn down-btn" id="btc-btn-down"><div class="btn-text">DOWN</div><div class="btn-num">-375.00</div></div>
+            <div class="opt-btn up-btn" id="btc-btn-up"><span class="btn-text">UP</span><span class="btn-num">+375.00</span></div>
+            <div class="opt-btn down-btn" id="btc-btn-down"><span class="btn-text">DOWN</span><span class="btn-num">-375.00</span></div>
         </div>
     </div>
 
@@ -131,8 +133,8 @@
         <div class="chart-section-title">Extendida (Minutos)</div>
         <div class="chart-box"><canvas id="xauMinChart"></canvas></div>
         <div class="options-container">
-            <div class="opt-btn up-btn" id="xau-btn-up"><div class="btn-text">UP</div><div class="btn-num">+2.00</div></div>
-            <div class="opt-btn down-btn" id="xau-btn-down"><div class="btn-text">DOWN</div><div class="btn-num">-2.00</div></div>
+            <div class="opt-btn up-btn" id="xau-btn-up"><span class="btn-text">UP</span><span class="btn-num">+2.00</span></div>
+            <div class="opt-btn down-btn" id="xau-btn-down"><span class="btn-text">DOWN</span><span class="btn-num">-2.00</span></div>
         </div>
     </div>
 
@@ -164,8 +166,8 @@
         <div class="chart-section-title">Extendida (Minutos)</div>
         <div class="chart-box"><canvas id="skhynixMinChart"></canvas></div>
         <div class="options-container">
-            <div class="opt-btn up-btn" id="skhynix-btn-up"><div class="btn-text">UP</div><div class="btn-num">+3.00</div></div>
-            <div class="opt-btn down-btn" id="skhynix-btn-down"><div class="btn-text">DOWN</div><div class="btn-num">-3.00</div></div>
+            <div class="opt-btn up-btn" id="skhynix-btn-up"><span class="btn-text">UP</span><span class="btn-num">+3.00</span></div>
+            <div class="opt-btn down-btn" id="skhynix-btn-down"><span class="btn-text">DOWN</span><span class="btn-num">-3.00</span></div>
         </div>
     </div>
 
@@ -175,7 +177,7 @@
     const ASSETS = {
         btc:     { symbol: 'btcusdt',     interval: '1h',  threshold: 375.0, color: '#f7931a' },
         xau:     { symbol: 'paxgusdt',    interval: '15m', threshold: 2.0,   color: '#f59e0b' },
-        skhynix: { symbol: 'skhynixusdt', fallback: 'ethusdt', interval: '15m', threshold: 3.0, color: '#e11d48' }
+        skhynix: { symbol: 'skhynixusdt', interval: '15m', threshold: 3.0,   color: '#e11d48', fallback: 'ethusdt' }
     };
 
     const state = {
@@ -202,32 +204,28 @@
 
     const charts = {
         btcSec:     createChart('btcSecChart', ASSETS.btc.color, true),
-        btcMin:     createChart('btcMinChart', '#7042e4'),
+        btcMin:     createChart('btcMinChart', ASSETS.btc.color),
         xauSec:     createChart('xauSecChart', ASSETS.xau.color, true),
-        xauMin:     createChart('xauMinChart', '#7042e4'),
+        xauMin:     createChart('xauMinChart', ASSETS.xau.color),
         skhynixSec: createChart('skhynixSecChart', ASSETS.skhynix.color, true),
-        skhynixMin: createChart('skhynixMinChart', '#7042e4')
+        skhynixMin: createChart('skhynixMinChart', ASSETS.skhynix.color)
     };
 
     async function fetchBasePrice(key) {
         const cfg = ASSETS[key];
         const st = state[key];
-        let symbolToUse = cfg.symbol;
-
+        let sym = cfg.symbol;
         try {
-            let resBase = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbolToUse.toUpperCase()}&interval=${cfg.interval}&limit=1`);
-            if (!resBase.ok && cfg.fallback) {
-                symbolToUse = cfg.fallback;
-                resBase = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbolToUse.toUpperCase()}&interval=${cfg.interval}&limit=1`);
+            let res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym.toUpperCase()}&interval=${cfg.interval}&limit=1`);
+            if (!res.ok && cfg.fallback) {
+                sym = cfg.fallback;
+                res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym.toUpperCase()}&interval=${cfg.interval}&limit=1`);
             }
-            const dataBase = await resBase.json();
+            const dataBase = await res.json();
             st.basePrice = parseFloat(dataBase[0][1]);
             document.getElementById(`${key}-base`).innerText = `$${st.basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-            let res1m = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbolToUse.toUpperCase()}&interval=1m&limit=60`);
-            if (!res1m.ok) {
-                res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbolToUse.toUpperCase()}&interval=1m&limit=60`);
-            }
+            let res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym.toUpperCase()}&interval=1m&limit=60`);
             const data1m = await res1m.json();
 
             st.minP = []; st.minL = [];
@@ -239,7 +237,7 @@
             charts[`${key}Min`].data.datasets[0].data = st.minP;
             charts[`${key}Min`].update();
         } catch (e) {
-            console.error(`Error de red para ${key}:`, e);
+            console.error(`Error en base de ${key}:`, e);
         }
     }
 
@@ -247,15 +245,11 @@
         const cfg = ASSETS[key];
         const st = state[key];
         const netElem = document.getElementById(`${key}-net`);
+        let sym = cfg.symbol;
 
-        if (st.ws) {
-            try { st.ws.close(); } catch(e){}
-        }
+        if (st.ws) { try { st.ws.close(); } catch(e){} }
 
-        let symbolToUse = cfg.symbol;
-        let wsUrl = `wss://fstream.binance.com/ws/${symbolToUse}@markPrice@1s`;
-
-        st.ws = new WebSocket(wsUrl);
+        st.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${sym}@ticker`);
 
         st.ws.onopen = () => {
             netElem.innerText = "🟢 En Vivo";
@@ -269,14 +263,14 @@
         };
 
         st.ws.onerror = () => {
-            if (cfg.fallback && symbolToUse !== cfg.fallback) {
-                st.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.fallback}@ticker`);
+            if (cfg.fallback) {
+                sym = cfg.fallback;
             }
         };
 
         st.ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const price = parseFloat(data.p || data.c);
+            const price = parseFloat(data.c);
             if (!st.basePrice || isNaN(price)) return;
 
             const delta = price - st.basePrice;
@@ -335,7 +329,6 @@
 
     function updateTimersAndDate() {
         const now = new Date();
-        
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const dateStr = now.toLocaleDateString('es-ES', options);
         document.getElementById('date-display').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
