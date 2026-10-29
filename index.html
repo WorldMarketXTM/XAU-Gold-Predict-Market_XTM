@@ -171,9 +171,9 @@
 
 <script>
     const ASSETS = {
-        btc:  { symbol: 'btcusdt',  interval: '1h',  threshold: 375.0, color: '#f7931a', isFutures: false },
-        xau:  { symbol: 'paxgusdt', interval: '15m', threshold: 2.0,   color: '#f59e0b', isFutures: false, fallback: 'btcusdt' },
-        sndk: { symbol: 'sndkusdt', interval: '15m', threshold: 3.0,   color: '#e11d48', isFutures: true,  fallback: 'ethusdt' }
+        btc:  { symbol: 'btcusdt',  interval: '1h',  threshold: 375.0, color: '#f7931a', restSymbol: 'BTCUSDT' },
+        xau:  { symbol: 'paxgusdt', interval: '15m', threshold: 2.0,   color: '#f59e0b', restSymbol: 'PAXGUSDT' },
+        sndk: { symbol: 'ethusdt',  interval: '15m', threshold: 3.0,   color: '#e11d48', restSymbol: 'ETHUSDT' }
     };
 
     const state = {
@@ -207,26 +207,16 @@
         sndkMin: createChart('sndkMinChart', ASSETS.sndk.color)
     };
 
-    async function fetchBasePrice(key) {
+    async function initAsset(key) {
         const cfg = ASSETS[key];
         const st = state[key];
-        let sym = cfg.symbol;
-        let apiHost = cfg.isFutures ? 'fapi.binance.com' : 'api.binance.com';
-        let apiPath = cfg.isFutures ? '/fapi/v1/klines' : '/api/v3/klines';
-
         try {
-            let res = await fetch(`https://${apiHost}${apiPath}?symbol=${sym.toUpperCase()}&interval=${cfg.interval}&limit=1`);
-            if (!res.ok && cfg.fallback) {
-                sym = cfg.fallback;
-                apiHost = 'api.binance.com';
-                apiPath = '/api/v3/klines';
-                res = await fetch(`https://${apiHost}${apiPath}?symbol=${sym.toUpperCase()}&interval=${cfg.interval}&limit=1`);
-            }
+            const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.restSymbol}&interval=${cfg.interval}&limit=1`);
             const dataBase = await res.json();
             st.basePrice = parseFloat(dataBase[0][1]);
             document.getElementById(`${key}-base`).innerText = `$${st.basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-            let res1m = await fetch(`https://${apiHost}${apiPath}?symbol=${sym.toUpperCase()}&interval=1m&limit=60`);
+            const res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.restSymbol}&interval=1m&limit=60`);
             const data1m = await res1m.json();
 
             st.minP = []; st.minL = [];
@@ -238,7 +228,7 @@
             charts[`${key}Min`].data.datasets[0].data = st.minP;
             charts[`${key}Min`].update();
         } catch (e) {
-            console.error(`Error en base de ${key}:`, e);
+            console.error(`Error inicializando ${key}:`, e);
         }
     }
 
@@ -246,15 +236,10 @@
         const cfg = ASSETS[key];
         const st = state[key];
         const netElem = document.getElementById(`${key}-net`);
-        let sym = cfg.symbol;
 
         if (st.ws) { try { st.ws.close(); } catch(e){} }
 
-        let wsUrl = cfg.isFutures 
-            ? `wss://fstream.binance.com/ws/${sym}@markPrice@1s`
-            : `wss://stream.binance.com:9443/ws/${sym}@ticker`;
-
-        st.ws = new WebSocket(wsUrl);
+        st.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.symbol}@ticker`);
 
         st.ws.onopen = () => {
             netElem.innerText = "🟢 En Vivo";
@@ -268,14 +253,13 @@
         };
 
         st.ws.onerror = () => {
-            if (cfg.fallback) {
-                st.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.fallback}@ticker`);
-            }
+            netElem.innerText = "🔴 Error Net";
+            netElem.className = "net-status net-offline";
         };
 
         st.ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const price = parseFloat(data.p || data.c);
+            const price = parseFloat(data.c);
             if (!st.basePrice || isNaN(price)) return;
 
             const delta = price - st.basePrice;
@@ -363,9 +347,9 @@
     }
 
     ['btc', 'xau', 'sndk'].forEach(key => {
-        fetchBasePrice(key);
+        initAsset(key);
         connectWebSocket(key);
-        setInterval(() => fetchBasePrice(key), 15000);
+        setInterval(() => initAsset(key), 15000);
     });
 
     setInterval(updateTimersAndDate, 1000);
