@@ -175,7 +175,7 @@
     const ASSETS = {
         btc:     { symbol: 'btcusdt',     interval: '1h',  threshold: 375.0, color: '#f7931a' },
         xau:     { symbol: 'paxgusdt',    interval: '15m', threshold: 2.0,   color: '#f59e0b' },
-        skhynix: { symbol: 'skhynixusdt', interval: '15m', threshold: 3.0,   color: '#e11d48' }
+        skhynix: { symbol: 'skhynixusdt', fallback: 'ethusdt', interval: '15m', threshold: 3.0, color: '#e11d48' }
     };
 
     const state = {
@@ -212,13 +212,22 @@
     async function fetchBasePrice(key) {
         const cfg = ASSETS[key];
         const st = state[key];
+        let symbolToUse = cfg.symbol;
+
         try {
-            const resBase = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
+            let resBase = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbolToUse.toUpperCase()}&interval=${cfg.interval}&limit=1`);
+            if (!resBase.ok && cfg.fallback) {
+                symbolToUse = cfg.fallback;
+                resBase = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbolToUse.toUpperCase()}&interval=${cfg.interval}&limit=1`);
+            }
             const dataBase = await resBase.json();
             st.basePrice = parseFloat(dataBase[0][1]);
             document.getElementById(`${key}-base`).innerText = `$${st.basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-            const res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=1m&limit=60`);
+            let res1m = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbolToUse.toUpperCase()}&interval=1m&limit=60`);
+            if (!res1m.ok) {
+                res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbolToUse.toUpperCase()}&interval=1m&limit=60`);
+            }
             const data1m = await res1m.json();
 
             st.minP = []; st.minL = [];
@@ -230,7 +239,7 @@
             charts[`${key}Min`].data.datasets[0].data = st.minP;
             charts[`${key}Min`].update();
         } catch (e) {
-            console.error(`Error consultando precio base para ${key}:`, e);
+            console.error(`Error de red para ${key}:`, e);
         }
     }
 
@@ -243,7 +252,10 @@
             try { st.ws.close(); } catch(e){}
         }
 
-        st.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.symbol}@ticker`);
+        let symbolToUse = cfg.symbol;
+        let wsUrl = `wss://fstream.binance.com/ws/${symbolToUse}@markPrice@1s`;
+
+        st.ws = new WebSocket(wsUrl);
 
         st.ws.onopen = () => {
             netElem.innerText = "🟢 En Vivo";
@@ -257,13 +269,14 @@
         };
 
         st.ws.onerror = () => {
-            netElem.innerText = "🔴 Error Net";
-            netElem.className = "net-status net-offline";
+            if (cfg.fallback && symbolToUse !== cfg.fallback) {
+                st.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.fallback}@ticker`);
+            }
         };
 
         st.ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const price = parseFloat(data.c);
+            const price = parseFloat(data.p || data.c);
             if (!st.basePrice || isNaN(price)) return;
 
             const delta = price - st.basePrice;
@@ -281,7 +294,7 @@
             } else if (delta <= -cfg.threshold) {
                 btnDown.classList.add('alert-down-active'); btnUp.classList.remove('alert-up-active');
             } else {
-                btnUp.classList.remove('alert-up-active'); btnDown.classList.remove('alert-up-active');
+                btnUp.classList.remove('alert-up-active'); btnDown.classList.remove('alert-down-active');
             }
 
             const now = new Date();
@@ -328,14 +341,17 @@
         document.getElementById('date-display').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
 
         const mins = now.getMinutes();
+        const secs = now.getSeconds();
 
         ['btc', 'xau', 'skhynix'].forEach(key => {
             const intervalMins = ASSETS[key].interval === '1h' ? 60 : 15;
-            const nextTime = Math.ceil((mins + 1) / intervalMins) * intervalMins;
+            const nextMins = Math.ceil((mins + (secs > 0 ? 1 : 0)) / intervalMins) * intervalMins;
             const targetDate = new Date(now);
-            targetDate.setMinutes(nextTime, 0, 0);
+            targetDate.setMinutes(nextMins, 0, 0);
 
-            const diffSecs = Math.floor((targetDate - now) / 1000);
+            let diffSecs = Math.floor((targetDate - now) / 1000);
+            if (diffSecs < 0) diffSecs = 0;
+
             const m = Math.floor(diffSecs / 60);
             const s = diffSecs % 60;
 
