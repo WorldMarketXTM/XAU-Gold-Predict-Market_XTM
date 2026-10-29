@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorldMarketXTM - Predict Panel Definitivo</title>
+    <title>XTM-Predict - World_Market</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background-color: #f0f2f5; color: #1e2329; margin: 0; padding: 15px; }
         
-        /* 1. Título y Fecha en un solo renglón, uno en cada esquina */
-        .header-top-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1800px; margin: 0 auto 15px auto; padding: 0 10px; }
-        .header-top-bar h1 { margin: 0; font-size: 1.2em; color: #0f172a; font-weight: 900; letter-spacing: -0.3px; }
-        .date-display { font-size: 0.85em; color: #475467; font-weight: 700; }
+        /* Título y Fecha centrados en un solo renglón con diagonal (/) */
+        .header-top-center { text-align: center; max-width: 1800px; margin: 0 auto 15px auto; padding: 0 10px; }
+        .header-top-center h1 { margin: 0; font-size: 1.25em; color: #0f172a; font-weight: 900; letter-spacing: -0.3px; }
 
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 15px; max-width: 1800px; margin: 0 auto; }
         .app-card { background-color: #ffffff; padding: 16px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 1px solid #eaeaea; display: flex; flex-direction: column; }
@@ -49,7 +48,6 @@
         .chart-section-title { font-size: 0.68em; color: #64748b; margin-bottom: 4px; text-transform: uppercase; font-weight: 700; }
         .chart-box { position: relative; height: 175px; width: 100%; margin-bottom: 10px; background: #ffffff; border-radius: 10px; padding: 4px; border: 1px solid #e2e8f0; }
         
-        /* 2. Botones UP / DOWN más delgados en un solo renglón */
         .options-container { display: flex; gap: 8px; margin-top: auto; }
         .opt-btn { flex: 1; background-color: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; }
         .opt-btn .btn-text { font-size: 0.85em; font-weight: 800; }
@@ -65,9 +63,8 @@
 </head>
 <body>
 
-<div class="header-top-bar">
-    <h1>predict - Panel Multipantalla</h1>
-    <div class="date-display" id="date-display">Cargando fecha...</div>
+<div class="header-top-center">
+    <h1 id="main-header-title">XTM-Predict - World_Market / Cargando...</h1>
 </div>
 
 <div class="dashboard-grid">
@@ -176,7 +173,7 @@
 <script>
     const ASSETS = {
         btc:     { symbol: 'btcusdt',     interval: '1h',  threshold: 375.0, color: '#f7931a' },
-        xau:     { symbol: 'paxgusdt',    interval: '15m', threshold: 2.0,   color: '#f59e0b' },
+        xau:     { symbol: 'paxgusdt',    interval: '15m', threshold: 2.0,   color: '#f59e0b', fallback: 'btcusdt' },
         skhynix: { symbol: 'skhynixusdt', interval: '15m', threshold: 3.0,   color: '#e11d48', fallback: 'ethusdt' }
     };
 
@@ -263,9 +260,7 @@
         };
 
         st.ws.onerror = () => {
-            if (cfg.fallback) {
-                sym = cfg.fallback;
-            }
+            if (cfg.fallback) { sym = cfg.fallback; }
         };
 
         st.ws.onmessage = (event) => {
@@ -331,7 +326,10 @@
         const now = new Date();
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const dateStr = now.toLocaleDateString('es-ES', options);
-        document.getElementById('date-display').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        const formattedDate = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        
+        // Título y Fecha centrados con una diagonal (/)
+        document.getElementById('main-header-title').innerText = `XTM-Predict - World_Market / ${formattedDate}`;
 
         const mins = now.getMinutes();
         const secs = now.getSeconds();
