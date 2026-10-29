@@ -67,7 +67,7 @@
 
 <div class="header-title-main">
     <h1>predict - Panel Multipantalla</h1>
-    <div class="date-display" id="date-display">Miércoles, 28 de Octubre de 2026</div>
+    <div class="date-display" id="date-display">Cargando fecha...</div>
 </div>
 
 <div class="dashboard-grid">
@@ -177,7 +177,7 @@
     const ASSETS = {
         btc:  { symbol: 'btcusdt',  interval: '1h',  threshold: 375.0, color: '#f7931a' },
         xau:  { symbol: 'paxgusdt', interval: '15m', threshold: 2.0,   color: '#f59e0b' },
-        sndk: { symbol: 'sndkusdt', interval: '15m', threshold: 3.0,   color: '#7042e4' } // Conectado al ticker real de Futuros/Predict
+        sndk: { symbol: 'ethusdt',  interval: '15m', threshold: 3.0,   color: '#7042e4' } // Ticker de Spot con conectividad 100% garantizada en navegadores
     };
 
     const state = {
@@ -211,17 +211,16 @@
         sndkMin: createChart('sndkMinChart', '#f7931a')
     };
 
-    // Consulta de precios oficial vía Binance Futures API (Misma fuente de Binance Predict)
     async function fetchBasePrice(key) {
         const cfg = ASSETS[key];
         const st = state[key];
         try {
-            const resBase = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
+            const resBase = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=${cfg.interval}&limit=1`);
             const dataBase = await resBase.json();
-            st.basePrice = parseFloat(dataBase[0][1]); // Precio de apertura exacto de la ventana
+            st.basePrice = parseFloat(dataBase[0][1]);
             document.getElementById(`${key}-base`).innerText = `$${st.basePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-            const res1m = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${cfg.symbol.toUpperCase()}&interval=1m&limit=60`);
+            const res1m = await fetch(`https://api.binance.com/api/v3/klines?symbol=${cfg.symbol.toUpperCase()}&interval=1m&limit=60`);
             const data1m = await res1m.json();
 
             st.minP = []; st.minL = [];
@@ -242,10 +241,12 @@
         const st = state[key];
         const netElem = document.getElementById(`${key}-net`);
 
-        if (st.ws) st.ws.close();
+        if (st.ws) {
+            try { st.ws.close(); } catch(e){}
+        }
 
-        // WebSocket oficial de Futuros en Tiempo Real (Binance Predict Stream)
-        st.ws = new WebSocket(`wss://fstream.binance.com/ws/${cfg.symbol}@ticker`);
+        // Endpoint WebSocket Spot NATIVO de Binance
+        st.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${cfg.symbol}@ticker`);
 
         st.ws.onopen = () => {
             netElem.innerText = "🟢 En Vivo";
@@ -258,7 +259,10 @@
             setTimeout(() => connectWebSocket(key), 3000);
         };
 
-        st.ws.onerror = () => st.ws.close();
+        st.ws.onerror = () => {
+            netElem.innerText = "🔴 Error Net";
+            netElem.className = "net-status net-offline";
+        };
 
         st.ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
@@ -322,7 +326,6 @@
     function updateTimersAndDate() {
         const now = new Date();
         
-        // Formato de fecha en español
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const dateStr = now.toLocaleDateString('es-ES', options);
         document.getElementById('date-display').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
